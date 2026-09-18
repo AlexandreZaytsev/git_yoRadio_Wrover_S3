@@ -182,7 +182,11 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 
 /******************************************/
 
+<<<<<<< HEAD
 //const int AMP_MUTE_GPIO = 12;//2;//21;//2;      // Выход на PAM8406
 #define AMP_MUTE_GPIO  12 
 
+=======
+#define AMP_MUTE_GPIO  12 //;//2;//21;//2;      // Выход на PAM8406
+>>>>>>> 80ac2bc8c2e18d35f99bce2236cb239f4c056db5
 #endif        //конец защиты от повторного включения
