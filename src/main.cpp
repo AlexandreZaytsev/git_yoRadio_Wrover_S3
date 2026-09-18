@@ -69,7 +69,7 @@ void setupOTA(){
 #endif
 
 //---------------------------------------------------------
-const int AMP_MUTE_GPIO = 12;//2;//21;//2;      // Выход на PAM8406
+//const int AMP_MUTE_GPIO = 12;//2;//21;//2;      // Выход на PAM8406
 // Состояние машины состояний для задержки
 enum MuteState {
   STATE_IDLE,
