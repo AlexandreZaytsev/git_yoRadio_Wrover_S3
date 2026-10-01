@@ -84,6 +84,26 @@ unsigned long stateStartTime = 0;
 
 void setup() {
   Serial.begin(115200);
+
+ // Выводим все критические пины
+  Serial.println("DEBUG PINS:");
+  Serial.print("BRIGHTNESS_PIN: "); Serial.println(BRIGHTNESS_PIN);
+  Serial.print("I2C_SCL: "); Serial.println(I2C_SCL);
+  Serial.print("VS1053_DCS: "); Serial.println(VS1053_DCS);
+  Serial.print("VS1053_DREQ: "); Serial.println(VS1053_DREQ);
+  Serial.print("I2S_DOUT: "); Serial.println(I2S_DOUT);
+  Serial.print("I2S_BCLK: "); Serial.println(I2S_BCLK);
+  Serial.print("I2S_LRC: "); Serial.println(I2S_LRC);
+  Serial.print("TS_SDA: "); Serial.println(TS_SDA);
+  Serial.print("TS_SCL: "); Serial.println(TS_SCL);
+  Serial.print("TS_RST: "); Serial.println(TS_RST);
+  Serial.print("TFT_MOSI: "); Serial.println(TFT_MOSI);
+
+
+
+
+
+
   if(REAL_LEDBUILTIN!=255) pinMode(REAL_LEDBUILTIN, OUTPUT);
   if (yoradio_on_setup) yoradio_on_setup();
   pm.on_setup();
