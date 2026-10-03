@@ -29,8 +29,8 @@ STORE YOUR SETTINGS IN THE *** myoptions.h *** FILE.
 #endif
 
 
-#if __has_include("../../mytheme.h")
-  #include "../../mytheme.h"            /* <- Theme file */
+#if __has_include("mytheme.h")
+    #include "mytheme.h"
 #endif
 #if __has_include("../../mqttoptions.h")
   #include "../../mqttoptions.h"
