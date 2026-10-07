@@ -5,13 +5,13 @@ namespace LANG{
 constexpr const char* const_waitForSD = "Please wait, SD card..."; 
 //==================================================
 #if L10N_LANGUAGE==RU
-  #define L10N_PATH "../../../locale/displayL10n_ru.h"
+  #define L10N_PATH "displayL10n_ru.h"
 #else
-  #define L10N_PATH "../../../locale/displayL10n_en.h"
+  #define L10N_PATH "displayL10n_en.h"
 #endif
 
-#if __has_include("../../../locale/displayL10n_custom.h")
-  #include "../../../locale/displayL10n_custom.h"
+#if __has_include("displayL10n_custom.h")
+  #include "displayL10n_custom.h"
 #else
   #include L10N_PATH
 #endif

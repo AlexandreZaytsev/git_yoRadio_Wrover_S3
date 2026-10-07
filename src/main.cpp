@@ -1,16 +1,16 @@
 #include "Arduino.h"
-#include "src/core/options.h"
-#include "src/core/config.h"
-#include "src/pluginsManager/pluginsManager.h"
-#include "src/core/telnet.h"
-#include "src/core/player.h"
-#include "src/core/display.h"
-#include "src/core/network.h"
-#include "src/core/netserver.h"
-#include "src/core/controls.h"
-#include "src/core/mqtt.h"
-#include "src/core/optionschecker.h"
-#include "src/core/timekeeper.h"
+#include "core/options.h"
+#include "core/config.h"
+#include "pluginsManager/pluginsManager.h"
+#include "core/telnet.h"
+#include "core/player.h"
+#include "core/display.h"
+#include "core/network.h"
+#include "core/netserver.h"
+#include "core/controls.h"
+#include "core/mqtt.h"
+#include "core/optionschecker.h"
+#include "core/timekeeper.h"
 #ifdef USE_NEXTION
 #include "src/displays/nextion.h"
 #endif
@@ -177,4 +177,4 @@ void loop() {
   #endif
 }
 
-#include "src/core/audiohandlers.h"
+#include "core/audiohandlers.h"
