@@ -20,6 +20,10 @@ STORE YOUR SETTINGS IN THE *** myoptions.h *** FILE.
     #if __has_include("myoptions_s3.h")
         #include "myoptions_s3.h"
     #endif
+#elif defined(ENV_ESP32_S3_DEVKITC_1_ALT)
+    #if __has_include("myoptions_s3_alt.h")
+        #include "myoptions_s3_alt.h"
+    #endif
 #elif defined(ENV_ESP32_WROVER_KIT)
     #if __has_include("myoptions_wrover.h")
         #include "myoptions_wrover.h"
