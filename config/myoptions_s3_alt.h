@@ -61,6 +61,6 @@ GPIO 19-20: заняты USB
 #define TS_RST              255   /* дефолт 25 занят OPI flash */
 
 /* AMP MUTE */
-#define AMP_MUTE_GPIO       19
+#define AMP_MUTE_GPIO       19 
 
 #endif
