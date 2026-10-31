@@ -2,15 +2,7 @@
 
 Platformio клоны сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693
 
+[pinout esp32 wrover e n8r8](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
 <img width="1756" height="510" alt="image" src="https://github.com/user-attachments/assets/037d2155-616b-46a3-9a60-12a4a676f2fe" />
+[pinout esp32 se alt n18r8](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.0.html)
 <img width="1757" height="554" alt="image" src="https://github.com/user-attachments/assets/053c8ca4-c9be-4467-ba24-9c83195614ae" />
-
-Features:
-  * Platformio enabled
-  * Logarithmics volume change
-  * Show encode type and bitrate
-  * Separated volume from stations in case of two encoders
-  * WiFiMulti for better connection
-
-The pins map for esp32-wroom (thanks for good picture from https://dzen.ru/a/Y774Df-le2kG3b99):
-![Pinount](https://github.com/ichebyki/yoRadio.vs/blob/main/pins.png)
