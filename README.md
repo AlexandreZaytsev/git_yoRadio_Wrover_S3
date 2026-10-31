@@ -3,6 +3,7 @@
 Platformio клоны сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693
 
 <img width="1756" height="510" alt="image" src="https://github.com/user-attachments/assets/037d2155-616b-46a3-9a60-12a4a676f2fe" />
+<img width="1757" height="554" alt="image" src="https://github.com/user-attachments/assets/053c8ca4-c9be-4467-ba24-9c83195614ae" />
 
 Features:
   * Platformio enabled
