@@ -1,5 +1,8 @@
 # yoRadio.vs
 
+Platformio клоны сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693
+
+
 Features:
   * Platformio enabled
   * Logarithmics volume change
