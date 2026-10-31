@@ -8,4 +8,4 @@ esp32 wrover e n8r8
 esp32 s3 n18r8    
 [chip and lcd from GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board](https://github.com/profharris/GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board/blob/main/README.md)    
 [pinout ESP32-S3-DevKitC-1 v1.1](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.0.html)
-<img width="1357" height="431" alt="image" src="https://github.com/user-attachments/assets/e9e7c60c-7c43-451f-a36e-4cd6bd511b04" />
+<img width="1491" height="479" alt="image" src="https://github.com/user-attachments/assets/954696eb-6092-46a1-a627-f03162bf92f7" />
