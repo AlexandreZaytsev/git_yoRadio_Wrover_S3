@@ -1,6 +1,6 @@
 # yoRadio.vs
 
-Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693
+Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693    
 esp32 wrover e n8r8    
 [pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
 <img width="1756" height="510" alt="image" src="https://github.com/user-attachments/assets/037d2155-616b-46a3-9a60-12a4a676f2fe" />
