@@ -62,5 +62,6 @@ GPIO 19-20: заняты USB
 
 /* AMP MUTE */
 #define AMP_MUTE_GPIO       46 //19 
+#define MAX_VOL 190   // потолок громкости, подбери на слух в диапазоне 170–200
 
 #endif
