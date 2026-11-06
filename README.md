@@ -12,4 +12,4 @@ esp32 s3 n16r8
 
 Железо в каталоге \hardware    
 Комментарии   
-[корпус](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
+![корпус](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
