@@ -12,10 +12,6 @@ esp32 s3 n16r8
 
 Железо в каталоге \hardware    
 Комментарии   
-- Корпус    
-![корпус](/hardware/Sunbuck%20LONVIN%20M3.png)
-- Чипы
-![корпус](hardware/ESP32-WROVER-E.png)
-![корпус](hardware/ESP-S3-DevKitC-1_ALT-version.png)
- 
-
+- Корпус - выкидываем все кроме динамиков (это фронтт), печатаем морду на 3D принтере со всеми интерфейсами (это бэк)    
+- Платы разработки в проекте с чипами esp32 wrover i r8n8 и [esp32 s3 alt1 n16r8 из набора](https://github.com/profharris/GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board) 
+- Монитор ILI9341 без тач или с [тач из набора](https://github.com/profharris/GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board) - но на тач пинов не хватит, кстати отличаются по посадке - с тач - pcb короче
