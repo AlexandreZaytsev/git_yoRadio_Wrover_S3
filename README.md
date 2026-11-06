@@ -12,7 +12,9 @@ esp32 s3 n16r8
 
 Железо в каталоге \hardware    
 Комментарии   
-- Корпус ![корпус](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3/blob/main/hardware/Sunbuck%20LONVIN%20M3.png)
-- Платы разработки ![корпус](hardware/Sunbuck%20LONVIN%20M3.png)
+- Корпус   
+  ![корпус](/hardware/Sunbuck%20LONVIN%20M3.png)
+- Платы разработки
+  ![корпус](hardware/Sunbuck%20LONVIN%20M3.png)
  
 
