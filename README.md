@@ -51,7 +51,9 @@ default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP3
 для s3 alt используем окружение   
 default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini 
 
-правки оригинала
+правки оригинала v0.9.693
+- добавлен выбор конфигурации в зависимости от используемой платы
+*/src/core/options.h* 
 - добавлен пин управлени mute - переменная #define AMP_MUTE_GPIO
 *в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi*
 - добавлено ограничение громкости при сохранении диапазона энкодера 255 - переменная - #define MAX_VOL 190
