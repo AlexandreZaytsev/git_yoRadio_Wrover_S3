@@ -40,3 +40,26 @@ esp32 s3 n16r8
 *из шнурка от Male разъема отключаем D+ D- и припаиваем к ним переходник 4pin VCC GND D+ D-*
 *зазъем Male внутри корпуса втыкаем в зарядник, а отведенные два провода через переходник в плату ESP32*
 *таким образом через один внешний раъем Type-C мы можем подключить или быструю зарядку или кабель для прошивки* 
+
+схему собираем по распиновке для выбранной платы 
+для wrover /config/myoptions_wrover.h
+для s3 alt /config/myoptions_s3_alt.h
+
+софт
+для wrover используем окружение    
+default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP32_Wrover-kit.ini
+для s3 alt используем окружение   
+default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini 
+
+правки оригинала
+- добавлен пин управлени mute - переменная #define AMP_MUTE_GPIO
+*в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi*
+- добавлено ограничение громкости при сохранении диапазона энкодера 255 - переменная - #define MAX_VOL 190
+*переписана функция /src/core/pllayer.cpp функция - volToI2S*
+- расширено количество wifi сетей с 5ти до 10
+*/src/core/config.h neworkItem ssids[10];*
+*/src/core/config.cpp функция - Config::initNetwork*
+*/data/www/options.html.gz добавлено в разметку +5 полей для wifi*
+- в вебморду добавлен блок будильника (типа спящий режим)- но пока не работает, не знаю как..., просто нарисовал
+*/data/www/options.html.gz*
+

@@ -920,7 +920,8 @@ bool Config::initNetwork() {
   }
   char ssidval[30], passval[40];
   uint8_t c = 0;
-  while (file.available()) {
+  //while (file.available()) {
+  while (file.available() && c < 10) {   // <-- добавлено условие
     if (parseSsid(file.readStringUntil('\n').c_str(), ssidval, passval)) {
       strlcpy(ssids[c].ssid, ssidval, 30);
       strlcpy(ssids[c].password, passval, 40);
