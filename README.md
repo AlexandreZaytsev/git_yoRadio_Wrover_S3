@@ -16,6 +16,6 @@ esp32 s3 n16r8
 ![корпус](/hardware/Sunbuck%20LONVIN%20M3.png)
 - Чипы
 ![корпус](hardware/ESP32-WROVER-E.png)
-![корпус](hardware/ESP-S3-DevKitC-1_ALT-version)
+![корпус](hardware/ESP-S3-DevKitC-1_ALT-version.png)
  
 
