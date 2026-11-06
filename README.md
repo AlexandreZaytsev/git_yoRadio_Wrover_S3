@@ -34,7 +34,7 @@ esp32 s3 n16r8
 - Модуль преобразователя напряжения occkic 3.6-32В в 5/9/12В 5А
 
 вход
-- Ставим шнурок Type-C 6pin для быстрой зарядки и передачи данных (DongLiLian USB-C4P6P водонепроницаемый разъем TYPE C2P) 
+- Ставим шнурок Type-C 6pin для быстрой зарядки и передачи данных (DongLiLian USB-C4P6P водонепроницаемый разъем TYPE C2P)     
 * с одной стороны Femaly на корпус
 * с другой стороны Male разъем 
 *из шнурка от Male разъема отключаем D+ D- и припаиваем к ним переходник 4pin VCC GND D+ D-*
@@ -47,21 +47,21 @@ esp32 s3 n16r8
 
 софт   
 для wrover используем окружение        
-default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP32_Wrover-kit.ini
+default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP32_Wrover-kit.ini    
 для s3 alt используем окружение   
-default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini 
+default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini    
 
-правки оригинала v0.9.693    
+правки оригинала v0.9.693      
 - добавлен выбор конфигурации в зависимости от используемой платы
-*/src/core/options.h* 
+*/src/core/options.h*    
 - добавлен пин управлени mute - переменная #define AMP_MUTE_GPIO
-*в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi*
+*в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi*    
 - добавлено ограничение громкости при сохранении диапазона энкодера 255 - переменная - #define MAX_VOL 190
-*переписана функция /src/core/pllayer.cpp функция - volToI2S*
-- расширено количество wifi сетей с 5ти до 10
-*/src/core/config.h neworkItem ssids[10];*
-*/src/core/config.cpp функция - Config::initNetwork*
-*/data/www/options.html.gz добавлено в разметку +5 полей для wifi*
+*переписана функция /src/core/pllayer.cpp функция - volToI2S*    
+- расширено количество wifi сетей с 5ти до 10    
+*/src/core/config.h neworkItem ssids[10];*    
+*/src/core/config.cpp функция - Config::initNetwork*    
+*/data/www/options.html.gz добавлено в разметку +5 полей для wifi*    
 - в вебморду добавлен блок будильника (типа спящий режим)- но пока не работает, не знаю как..., просто нарисовал
-*/data/www/options.html.gz*
+*/data/www/options.html.gz*    
 
