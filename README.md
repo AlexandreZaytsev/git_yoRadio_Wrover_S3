@@ -1,6 +1,6 @@
 # yoRadio.vs
 первая версия    
-![v1]/hardware/release_v1.png)
+![v1](/hardware/release_v1.png)
 ![3d](/hardware/kompas_3d/asm.png)
 вторая версия
 
