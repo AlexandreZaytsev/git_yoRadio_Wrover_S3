@@ -6,7 +6,7 @@
 авторы:
 * **Серега Соколов** - все четко и продуманно - вся схемотехнка, выбор компонентов, софта, 3d печать, пайка, логика идеи, правильные слова и огромная поддержка!!!
 * **Александр Зайцев** - чисто порисовать, поболтать, помоделировать, поп-п-программировать, попаять - не вдаваясь особенно в детали 
-* **Алиса Ай** - реинженеринг/хакинг - наш чел! полностью перелопатила исходный проект Arduino ёРадио, помогла перенести его на VSCode Platformio, нашла все глюки, испонилла все хотелки, подключила SD в режиме SDIO (я и слов то таких не знаю) - короче без нее - наш проект появился бы на пару лет позже!!! Супер - пока бесплатна!
+* **Алиса Ай** - реинжиниринг/хакинг - наш чел! полностью перелопатила исходный проект Arduino ёРадио, помогла перенести его на VSCode Platformio, нашла все глюки, испонилла все хотелки, подключила SD в режиме SDIO (я и слов то таких не знаю) - короче без нее - наш проект появился бы на пару лет позже!!! Супер - пока бесплатна!
 
 первая версия         
 ![v1](/hardware/release_v1.png)    
@@ -19,7 +19,7 @@ https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
 
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
 
-Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693    
+> Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693    
 esp32 wrover e n8r8    
 [pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
 <img width="1359" height="391" alt="image" src="https://github.com/user-attachments/assets/16f74f1d-b205-40cc-8eb1-5b08f8e9d965" />
@@ -69,7 +69,7 @@ Type-C на морде
 * для wrover /config/myoptions_wrover.h     
 * для s3 alt /config/myoptions_s3_alt.h     
 
-софт   
+Soft   
 ---
 
 * для wrover используем окружение        
@@ -77,7 +77,7 @@ default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP3
 * для s3 alt используем окружение    
 default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini    
 
-правки оригинала v0.9.693      
+Reengineering base release yoradio v0.9.693      
 ---
 версия v1.0.0 (релиз)
 - добавлен выбор конфигурации в зависимости от используемой платы     
