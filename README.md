@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/79264a1a-5e9e-4384-92f2-55321f4051c1
+
 # yoRadio.vs
 первая версия     
 ![v1](/hardware/release_v1.png)
