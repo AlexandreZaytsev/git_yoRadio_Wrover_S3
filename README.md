@@ -67,7 +67,6 @@ esp32 s3 n16r8
 
 софт   
 ---
-версия v1.0.0 (релиз)
 
 * для wrover используем окружение        
 default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP32_Wrover-kit.ini    
@@ -75,6 +74,8 @@ default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP3
 default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini    
 
 правки оригинала v0.9.693      
+---
+версия v1.0.0 (релиз)
 - добавлен выбор конфигурации в зависимости от используемой платы     
    - [x] /src/core/options.h    
 - /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная #define AMP_MUTE_GPIO (пин управлени mute)    
