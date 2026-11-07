@@ -3,14 +3,14 @@
 
 # yoRadio.vs
 первая версия     
-![v1](/hardware/release_v1.png)
-https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
+![v1](/hardware/release_v1.png)    
 
-https://github.com/user-attachments/assets/79264a1a-5e9e-4384-92f2-55321f4051c1
+https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
 
 вторая версия    
 ![3d](/hardware/kompas_3d/asm.png)    
-![v1](/hardware/release_v2.png)
+![v1](/hardware/release_v2.png)    
+
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
 
 Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693    
