@@ -628,8 +628,23 @@ void Display::_time(bool redraw) {
   #endif*/
 }
 
+
+
+//мое - маленький помощник смешивания цветов RGB565
+static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t) { // t: 0..255
+  int r1 = (c1 >> 11) & 0x1F, g1 = (c1 >> 5) & 0x3F, b1 = c1 & 0x1F;
+  int r2 = (c2 >> 11) & 0x1F, g2 = (c2 >> 5) & 0x3F, b2 = c2 & 0x1F;
+  int r = r1 + ((r2 - r1) * t) / 255;
+  int g = g1 + ((g2 - g1) * t) / 255;
+  int b = b1 + ((b2 - b1) * t) / 255;
+  return (uint16_t)((r << 11) | (g << 5) | b);
+}
+
 void Display::_volume() {
-  if(_volbar) _volbar->setValue(config.store.volume);
+ 
+/*    
+ //original
+    if(_volbar) _volbar->setValue(config.store.volume);
   #ifndef HIDE_VOL
     if(_voltxt) _voltxt->setText(config.store.volume, voltxtFmt);
   #endif
@@ -637,6 +652,39 @@ void Display::_volume() {
     timekeeper.waitAndReturnPlayer(3);
     _nums->setText(config.store.volume, numtxtFmt);
   }
+ */
+ 
+ //с учетом ограничения громкости
+ /*
+  Полоса (_volbar) остаётся на шкале 0–254 — она показывает, где крутишь ручка. Менять её не надо.
+  Число внизу (_voltxt) теперь показывает фактическое значение, уходящее в setVolume() ЦАПа — с учётом и MAX_VOL, и station.ovol. 
+  То есть ровно то, что у тебя сейчас печатает Serial.printf в volToI2S().
+  Диалог громкости (_nums) — тоже переведён на реальное значение. 
+  Если хочешь, чтобы в диалоге ручка/число оставались «сырыми» (0–254), а внизу — ЦАП, оставь в _nums прежнее config.store.volume и не трогай ту строку.
+ */
+  if(_volbar) _volbar->setValue(config.store.volume);   // полоса — сырая ручка
+  uint8_t dacVol = player.volToI2S(config.store.volume); // реальное число на ЦАПе
+
+  // зона предупреждения: от сырого MAX_VOL до верха ручки (254)
+  uint16_t t = 0;
+  if (config.store.volume > MAX_VOL)
+    t = (uint16_t)(config.store.volume - MAX_VOL) * 255 / (254 - MAX_VOL);
+  uint16_t volColor = blendColor(config.theme.vol, VOL_OVER_COLOR, t);
+
+  #ifndef HIDE_VOL
+    if(_voltxt) {
+      _voltxt->setFgColor(volColor);
+      _voltxt->setText(dacVol, voltxtFmt);
+    }
+  #endif
+  if(_mode==VOL) {
+    timekeeper.waitAndReturnPlayer(3);
+//диалог громкости цвет и цыфры
+    _nums->setFgColor(blendColor(config.theme.digit, VOL_OVER_COLOR, t));
+   //_nums->setText(player.volToI2S(config.store.volume), numtxtFmt);  //в диалоге ручка/число реальное значение на цап
+    _nums->setText(config.store.volume, numtxtFmt); //в диалоге ручка/число оставались «сырыми» (0–254)
+  }
+
   /*#ifdef USE_NEXTION
     nextion.setVol(config.store.volume, _mode == VOL);
   #endif*/

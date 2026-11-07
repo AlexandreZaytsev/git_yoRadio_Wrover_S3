@@ -73,10 +73,17 @@ default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoar
 правки оригинала v0.9.693      
 - добавлен выбор конфигурации в зависимости от используемой платы     
 */src/core/options.h*    
-- добавлен пин управлени mute - переменная #define AMP_MUTE_GPIO    
+- /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная #define AMP_MUTE_GPIO (пин управлени mute)    
 *в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi*    
-- добавлено ограничение громкости (чтобы динамики не 'пожечь' по вч) при сохранении диапазона энкодера 255 - переменная - #define MAX_VOL 190    
-*переписана функция /src/core/pllayer.cpp функция - volToI2S*    
+- добавлено ограничение громкости (чтобы динамики не 'пожечь' по вч) при сохранении диапазона энкодера 255
+*/config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная MAX_VOL 190*    
+*/config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная VOL_WARN_ZONE 20 зона плавного изменения цвета*    
+*/src/core/player.cpp переписана функция - uint8_t Player::volToI2S(uint8_t volume)*  
+- добавлено отображение превышения громкости - основная цифра и полоса сырые данные 0-255, число внизу данные на ЦАП, цвет превышение лимита MAX_VOL в зоне VOL_WARN_ZONE   
+* /src/displays/widgets/widgets.h в классе Widgets добавлена функция setFgColor(uint16_t color)
+* /src/core/display.cpp добавлена структура для плавной генерации цвета static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t)
+* /src/core/display.cpp переписана функция - Display::_volume()
+* /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная цвета превышенния ограничения VOL_OVER_COLOR    
 - расширено количество wifi сетей с 5ти до 10    
 */src/core/config.h neworkItem ssids[10];*    
 */src/core/config.cpp функция - Config::initNetwork*    

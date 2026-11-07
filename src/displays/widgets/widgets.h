@@ -30,6 +30,14 @@ class Widget{
     void setAlign(WidgetAlign align){
       _config.align = align;
     }
+
+//сеттер для методов TextWidget (_voltxt), и NumWidget (_nums) - обрабатываем превышение лимита громкости 
+    void setFgColor(uint16_t color){
+      if(_fgcolor == color) return;
+      _fgcolor = color;
+      if(_active && !_locked) _draw();
+     }   // <-- добавить
+
     void setActive(bool act, bool clr=false) { _active = act; if(_active && !_locked) _draw(); if(clr && !_locked) _clear(); }
     void lock(bool lck=true) { _locked = lck; if(_locked) _reset(); if(_locked && _active) _clear();  }
     void unlock() { _locked = false; }

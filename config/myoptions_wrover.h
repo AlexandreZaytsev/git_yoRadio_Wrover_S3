@@ -185,5 +185,10 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 //const int AMP_MUTE_GPIO = 12;//2;//21;//2;      // Выход на PAM8406
 #define AMP_MUTE_GPIO  12 
 #define MAX_VOL 190   // потолок громкости, подбери на слух в диапазоне 170–200
-
+#ifndef VOL_OVER_COLOR
+  #define VOL_OVER_COLOR 0xF800     // цвет превышения громкости MAX_VOL - красный, RGB565
+#endif
+#ifndef VOL_WARN_ZONE
+  #define VOL_WARN_ZONE 20   // последние 20 единиц ручки — постепенное покраснение
+#endif
 #endif        //конец защиты от повторного включения
