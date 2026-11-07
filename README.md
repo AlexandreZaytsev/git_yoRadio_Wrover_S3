@@ -54,14 +54,14 @@ esp32 s3 n16r8
 *разъем 6pinMale внутри корпуса втыкаем в зарядник (vcc gnd cc1 cc2), а 4pinMale в плату ESP32 (d+ d-)*
 *таким образом через один внешний разъем Type-C мы можем подключить или быструю зарядку или кабель для прошивки* 
 
-схему собираем по распиновке для выбранной платы     
-для wrover /config/myoptions_wrover.h
-для s3 alt /config/myoptions_s3_alt.h
+схему собираем по распиновке для выбранной платы         
+* для wrover /config/myoptions_wrover.h     
+* для s3 alt /config/myoptions_s3_alt.h     
 
 софт   
-для wrover используем окружение        
+* для wrover используем окружение        
 default_envs = esp32-wrover-kit из файла /config/env/config_DevBoard_ESP32_Wrover-kit.ini    
-для s3 alt используем окружение    
+* для s3 alt используем окружение    
 default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoard_ESP32-S3-DevKitC-1-ALT.ini    
 
 правки оригинала v0.9.693      
