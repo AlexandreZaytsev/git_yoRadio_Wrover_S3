@@ -107,7 +107,7 @@ Reengineering base release yoradio v0.9.693
 > [!NOTE]
 текущая сборка
 
-- в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO        
+- в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO (используйте короткие провода)       
    - [x] /src/core/sdmanager.h заменен целиком
    - [x] /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
    - [x] /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI
