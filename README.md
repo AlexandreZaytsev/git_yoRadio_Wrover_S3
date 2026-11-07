@@ -61,7 +61,7 @@ default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoar
 */src/core/options.h*    
 - добавлен пин управлени mute - переменная #define AMP_MUTE_GPIO    
 *в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi*    
-- добавлено ограничение громкости при сохранении диапазона энкодера 255 - переменная - #define MAX_VOL 190    
+- добавлено ограничение громкости (чтобы динамики не 'пожечь' по вч) при сохранении диапазона энкодера 255 - переменная - #define MAX_VOL 190    
 *переписана функция /src/core/pllayer.cpp функция - volToI2S*    
 - расширено количество wifi сетей с 5ти до 10    
 */src/core/config.h neworkItem ssids[10];*    
