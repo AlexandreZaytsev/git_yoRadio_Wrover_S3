@@ -89,9 +89,9 @@ Reengineering base release yoradio v0.9.693
    - [x] в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi    
 - добавлено ограничение громкости (чтобы динамики не 'пожечь' по вч) при сохранении диапазона энкодера 255
    - [x] /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная MAX_VOL 190    
-   - [x] /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная VOL_WARN_ZONE 20 зона плавного изменения цвета    
+   - [x] ~~/config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная VOL_WARN_ZONE 20 зона плавного изменения цвета~~    
    - [x] /src/core/player.cpp переписана функция - uint8_t Player::volToI2S(uint8_t volume)  
-- добавлено отображение превышения громкости - основная цифра и полоса сырые данные 0-255, число внизу данные на ЦАП, цвет превышение лимита MAX_VOL в зоне VOL_WARN_ZONE   
+- добавлено отображение превышения громкости - основная цифра и полоса сырые данные 0-255, число внизу данные на ЦАП, цвет на превышение лимита MAX_VOL ~~в зоне VOL_WARN_ZONE~~   
    - [x] /src/displays/widgets/widgets.h в классе Widgets добавлена функция setFgColor(uint16_t color)
    - [x] /src/core/display.cpp добавлена структура для плавной генерации цвета static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t)
    - [x] /src/core/display.cpp переписана функция - Display::_volume()
