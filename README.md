@@ -19,7 +19,8 @@ https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
 
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
 
-> Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693    
+> Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693  
+
 esp32 wrover e n8r8    
 [pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
 <img width="1359" height="391" alt="image" src="https://github.com/user-attachments/assets/16f74f1d-b205-40cc-8eb1-5b08f8e9d965" />
@@ -79,7 +80,9 @@ default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoar
 
 Reengineering base release yoradio v0.9.693      
 ---
+> [!NOTE]
 версия v1.0.0 (релиз)
+
 - добавлен выбор конфигурации в зависимости от используемой платы     
    - [x] /src/core/options.h    
 - /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная #define AMP_MUTE_GPIO (пин управлени mute)    
@@ -101,6 +104,7 @@ Reengineering base release yoradio v0.9.693
    - [x] /data/www/options.html.gz*
     
 ---    
+> [!NOTE]
 текущая сборка
 
 - в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO        
