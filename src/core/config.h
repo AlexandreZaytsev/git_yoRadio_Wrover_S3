@@ -16,8 +16,8 @@
 #define TMP_PATH          "/data/tmpfile.txt"
 #define INDEX_PATH        "/data/index.dat"
 
-#define PLAYLIST_SD_PATH     "/data/playlistsd.csv"
-#define INDEX_SD_PATH        "/data/indexsd.dat"
+#define PLAYLIST_SD_PATH     "/data/playlistsd.csv"   //пути плейлиста
+#define INDEX_SD_PATH        "/data/indexsd.dat"      //
 
 #define REAL_PLAYL   config.getMode()==PM_WEB?PLAYLIST_PATH:PLAYLIST_SD_PATH
 #define REAL_INDEX   config.getMode()==PM_WEB?INDEX_PATH:INDEX_SD_PATH

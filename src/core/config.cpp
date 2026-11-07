@@ -72,6 +72,9 @@ void Config::init() {
 #if IR_PIN!=255
     irindex=-1;
 #endif
+
+//Алиса
+/*
 #if defined(SD_SPIPINS) || SD_HSPI
   #if !defined(SD_SPIPINS)
     SDSPI.begin();
@@ -79,6 +82,8 @@ void Config::init() {
     SDSPI.begin(SD_SPIPINS); // SCK, MISO, MOSI
   #endif
 #endif
+*/
+
   eepromRead(EEPROM_START, store);
   bootInfo(); // https://github.com/e2002/yoradio/pull/149
   if (store.config_set != 4262) {

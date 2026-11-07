@@ -188,7 +188,10 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef VOL_OVER_COLOR
   #define VOL_OVER_COLOR 0xF800     // цвет превышения громкости MAX_VOL - красный, RGB565
 #endif
+/*
+после перехода на зону «от MAX_VOL до 254» не читается нигде. Можно удалить.
 #ifndef VOL_WARN_ZONE
   #define VOL_WARN_ZONE 20   // последние 20 единиц ручки — постепенное покраснение
 #endif
+*/
 #endif        //конец защиты от повторного включения

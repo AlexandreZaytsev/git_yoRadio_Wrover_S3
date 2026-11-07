@@ -153,9 +153,14 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #ifndef SDC_CS
   #define SDC_CS        255  // SDCARD CS pin
 #endif
+
+//Алиса
+/*
 #ifndef SD_HSPI
   #define SD_HSPI       false  // use HSPI for SD (miso=12, mosi=13, clk=14) instead of VSPI (by default)
 #endif
+*/
+
 #if SDC_CS!=255
   #define USE_SD
 #endif

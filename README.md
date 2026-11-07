@@ -89,5 +89,11 @@ default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoar
    * /src/core/config.cpp функция - Config::initNetwork    
    * /data/www/options.html.gz добавлено в разметку +5 полей для wifi    
 - в вебморду добавлен блок будильника (типа спящий режим)- но пока не работает, не знаю как..., просто нарисовал
-   * /data/www/options.html.gz*    
+   * /data/www/options.html.gz*
+- в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO        
+   * /src/core/sdmanager.h заменен целиком
+   * /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
+   * /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI
+   * /src/core/options.h
+
 

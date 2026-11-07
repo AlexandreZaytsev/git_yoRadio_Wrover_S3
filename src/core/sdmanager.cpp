@@ -1,16 +1,31 @@
 #include "options.h"
 #if SDC_CS!=255
 #include <Arduino.h>
+
+//Алиса
+/*
 #include <SPI.h>
 #include <SD.h>
+*/
+
 #include "vfs_api.h"
+
+//Алиса
+/*
 #include "sd_diskio.h"
 //#define USE_SD
+*/
+
+//Алиса
+#include "SD_MMC.h"
+
 #include "config.h"
 #include "sdmanager.h"
 #include "display.h"
 #include "player.h"
 
+//Алиса
+/*
 #if defined(SD_SPIPINS) || SD_HSPI
 SPIClass  SDSPI(HSPI);
 #define SDREALSPI SDSPI
@@ -21,9 +36,11 @@ SPIClass  SDSPI(HSPI);
 #ifndef SDSPISPEED
   #define SDSPISPEED 20000000
 #endif
+*/
 
 SDManager sdman(FSImplPtr(new VFSImpl()));
 
+/*
 bool SDManager::start(){
   ready = begin(SDC_CS, SDREALSPI, SDSPISPEED);
   vTaskDelay(10);
@@ -51,6 +68,38 @@ bool SDManager::cardPresent() {
   if(sectorSize()>0 && !bread) return false;
   return bread;
 }
+
+*/
+
+//Алиса
+bool SDManager::start(){
+  setPins(SDIO_SCK, SDIO_CMD, SDIO_D0, SDIO_D1, SDIO_D2, SDIO_D3);
+  ready = begin("/sdcard", false);        // 4-битный режим
+  vTaskDelay(10);
+  if(!ready) ready = begin("/sdcard", false);
+  vTaskDelay(20);
+  if(!ready){                             // запасной путь: 1-битный режим
+    setPins(SDIO_SCK, SDIO_CMD, SDIO_D0);
+    ready = begin("/sdcard", true);
+  }
+  return ready;
+}
+
+void SDManager::stop(){
+  end();
+  ready = false;
+}
+
+bool SDManager::cardPresent() {
+  if(!ready) return false;
+  if(cardType()==CARD_NONE) return false;
+  File f = open("/");      // форсируем физическую операцию — ловит выдёргивание карты
+  if(!f) return false;
+  f.close();
+  return true;
+}
+
+
 
 bool SDManager::_checkNoMedia(const char* path){
   if (path[strlen(path) - 1] == '/')
