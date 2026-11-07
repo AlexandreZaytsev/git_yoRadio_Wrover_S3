@@ -99,9 +99,9 @@ default_envs = esp32-s3-devkitc-1-alt из файла /config/env/config_DevBoar
 текущая сборка
 
 - в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO        
-   - [ ] /src/core/sdmanager.h заменен целиком
-   * /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
-   * /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI
-   * /src/core/options.h
+   - [x] /src/core/sdmanager.h заменен целиком
+   - [x] /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
+   - [x] /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI
+   - [x] /src/core/options.h
 
 
