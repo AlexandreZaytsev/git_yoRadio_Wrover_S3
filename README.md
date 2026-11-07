@@ -1,6 +1,9 @@
 # yoRadio.vs
-
+первая версия    
+![v1]/hardware/release_v1.png)
 ![3d](/hardware/kompas_3d/asm.png)
+вторая версия
+
 
 Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693    
 esp32 wrover e n8r8    
