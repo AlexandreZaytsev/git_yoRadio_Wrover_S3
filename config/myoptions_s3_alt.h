@@ -37,16 +37,16 @@ GPIO 19-20: заняты USB
 //#define I2C_SDA             -1    /* дефолт 21 валиден, но не используется */
 //#define I2C_SCL             -1    /* дефолт 22 занят OPI flash */
 
-/* ENCODER */
-#define ENC_BTNL            42 //7  s1
+/* ENCODER громкость */
+#define ENC_BTNL            2 //42 //7  s1
 #define ENC_BTNB            1 //15  key
-#define ENC_BTNR            2 //16  s2
+#define ENC_BTNR            42 //2 //16  s2
 #define ENC_HALFQUARD       true
 
-/* ENCODER2 */
-#define ENC2_BTNL           21 //17  s1
+/* ENCODER2 список станций*/
+#define ENC2_BTNL           40 //21 //17  s1
 #define ENC2_BTNB           41 //18  key
-#define ENC2_BTNR           40 //8   s2
+#define ENC2_BTNR           21 //40 //8   s2
 #define ENC2_HALFQUARD      false
 
 /* IR control */
