@@ -322,6 +322,8 @@ uint8_t Player::volToI2S(uint8_t volume) {
   return vol;
 }
 */
+
+ //алиса
 uint8_t Player::volToI2S(uint8_t volume) {
   int vol = map(volume, 0, 254 - config.station.ovol * 3, 0, MAX_VOL);   //превышение MAX_VOL размазывается 0-255
 //  int vol = map(volume, 0, 254 - config.station.ovol * 3, 0, 254);  // превышение MAX_VOL осекается  0-MAX_VOL

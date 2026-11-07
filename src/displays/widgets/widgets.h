@@ -31,6 +31,7 @@ class Widget{
       _config.align = align;
     }
 
+//алиса    
 //сеттер для методов TextWidget (_voltxt), и NumWidget (_nums) - обрабатываем превышение лимита громкости 
     void setFgColor(uint16_t color){
       if(_fgcolor == color) return;

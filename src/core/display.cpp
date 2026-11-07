@@ -630,7 +630,7 @@ void Display::_time(bool redraw) {
 
 
 
-//мое - маленький помощник смешивания цветов RGB565
+//алиса - маленький помощник смешивания цветов RGB565
 static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t) { // t: 0..255
   int r1 = (c1 >> 11) & 0x1F, g1 = (c1 >> 5) & 0x3F, b1 = c1 & 0x1F;
   int r2 = (c2 >> 11) & 0x1F, g2 = (c2 >> 5) & 0x3F, b2 = c2 & 0x1F;
@@ -641,7 +641,7 @@ static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t) { // t: 0..255
 }
 
 void Display::_volume() {
- 
+  
 /*    
  //original
     if(_volbar) _volbar->setValue(config.store.volume);
@@ -654,7 +654,7 @@ void Display::_volume() {
   }
  */
  
- //с учетом ограничения громкости
+ //алиса  с учетом ограничения громкости
  /*
   Полоса (_volbar) остаётся на шкале 0–254 — она показывает, где крутишь ручка. Менять её не надо.
   Число внизу (_voltxt) теперь показывает фактическое значение, уходящее в setVolume() ЦАПа — с учётом и MAX_VOL, и station.ovol. 
