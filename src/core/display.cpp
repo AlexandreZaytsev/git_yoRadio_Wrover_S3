@@ -300,16 +300,13 @@ void Display::_start() {
   if(_weather)  _weather->lock(!config.store.showweather);
   if(_weather && config.store.showweather)  _weather->setText(LANG::const_getWeather);
 
-//Алиса
-//  if(_vuwidget) _vuwidget->lock();
-
+	//Алиса
   // Фикс: на холодном старте с SD плеер начинает играть раньше, чем строится экран.
   // Событие PSTART при этом теряется, и безусловный lock() оставлял VU заблокированным
   // до первого захода в плейлист. Поэтому лочим только если VU выключен в настройках
   // ИЛИ плеер ещё не играет. В WEB-режиме плеер на этот момент ещё не играет —
   // поведение не меняется, VU там разблокирует PSTART как раньше.
-if(_vuwidget) _vuwidget->lock(!config.store.vumeter || !player.isRunning());
-
+	if(_vuwidget) _vuwidget->lock(!config.store.vumeter || !player.isRunning());
 
   if(_rssi)     _setRSSI(WiFi.RSSI());
   #ifndef HIDE_IP
@@ -563,10 +560,6 @@ void Display::loop() {
           return;
       }
   }
-
-  //алиса: страховка от пропущенного PSTART на старте с SD
-  //if(_bootStep==2 && _mode==PLAYER && _vuwidget && config.store.vumeter
-  //   && player.isRunning() && _vuwidget->locked()) _layoutChange(true);
 
   dsp.loop();
 /*
