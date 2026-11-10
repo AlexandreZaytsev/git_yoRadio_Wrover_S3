@@ -314,33 +314,23 @@ void Player::stepVol(bool up) {
   }
 }
 
-/*
+//алиса  
+// Преобразование «сырой» ручки громкости (0..254, как хранится в config.store.volume)
+// в фактическое значение для ЦАПа/VS1053.
+// Учитываются два ограничения:
+//   - config.station.ovol — per-station offset: верх шкалы сдвигается на 254 - ovol*3,
+//     так станция с «громким» потоком не орёт на той же ручке;
+//   - MAX_VOL (options.h) — общий программный предел усиления.
+// Диапазон 0..MAX_VOL размазывается на весь ход ручки ВЫШЕ предела: значение на
+// ЦАПе никогда не превысит MAX_VOL, но визуально ручка продолжает доходить до 254.
+// (Альтернатива — жёсткое отсечение: map(..., 0, 254), тогда движение ручки выше
+// MAX_VOL не меняет звук. Для смены варианта править аргумент функции map().)
 uint8_t Player::volToI2S(uint8_t volume) {
-  int vol = map(volume, 0, 254 - config.station.ovol * 3 , 0, 254);
-  if (vol > 254) vol = 254;
-  if (vol < 0) vol = 0;
-  return vol;
-}
-*/
-
- //алиса
-uint8_t Player::volToI2S(uint8_t volume) {
-  int vol = map(volume, 0, 254 - config.station.ovol * 3, 0, MAX_VOL);   //превышение MAX_VOL размазывается 0-255
-//  int vol = map(volume, 0, 254 - config.station.ovol * 3, 0, 254);  // превышение MAX_VOL осекается  0-MAX_VOL
+  int vol = map(volume, 0, 254 - config.station.ovol * 3, 0, MAX_VOL);
   if (vol > MAX_VOL) vol = MAX_VOL;   // реальный потолок
   if (vol < 0) vol = 0;
-
-
-/*  
-// ТЕСТ: выводим в Serial, чтобы видеть, что реально уходит
-  Serial.printf("vol input=%d, mapped=%d, capped=%d, MAX_VOL=%d\n",
-                 volume, map(volume, 0, 254 - config.station.ovol * 3, 0, MAX_VOL),
-                 vol, MAX_VOL);
-*/
   return vol;
 }
-
-
 
 
 void Player::_loadVol(uint8_t volume) {

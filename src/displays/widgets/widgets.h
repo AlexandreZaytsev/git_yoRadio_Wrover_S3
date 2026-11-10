@@ -32,12 +32,16 @@ class Widget{
     }
 
 //алиса    
-//сеттер для методов TextWidget (_voltxt), и NumWidget (_nums) - обрабатываем превышение лимита громкости 
+    // Устанавливает цвет текста и перерисовывает виджет, если он активен и не залочен.
+    // Добавлено для подсветки зоны перегруза громкости: Display::_volume() вызывает его
+    // у _voltxt (TextWidget) и _nums (NumWidget), передавая цвет, плавно подкрашенный
+    // к VOL_OVER_COLOR за пределом MAX_VOL (см. blendColor() в display.cpp).
+    // Ранний выход при неизменном цвете — чтобы не дёргать _draw() на каждый вызов.
     void setFgColor(uint16_t color){
       if(_fgcolor == color) return;
       _fgcolor = color;
       if(_active && !_locked) _draw();
-     }   // <-- добавить
+    }
 
     void setActive(bool act, bool clr=false) { _active = act; if(_active && !_locked) _draw(); if(clr && !_locked) _clear(); }
     void lock(bool lck=true) { _locked = lck; if(_locked) _reset(); if(_locked && _active) _clear();  }

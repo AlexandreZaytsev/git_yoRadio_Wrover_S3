@@ -651,9 +651,10 @@ void Display::_time(bool redraw) {
   #endif*/
 }
 
-
-
-//алиса - маленький помощник смешивания цветов RGB565
+//алиса
+// Смешивание двух цветов RGB565 в пропорции t (0..255):
+// t=0 — полностью c1, t=255 — полностью c2. t посередине — плавный переход.
+// Вспомогательная функция для подсветки зоны перегруза громкости в _volume().
 static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t) { // t: 0..255
   int r1 = (c1 >> 11) & 0x1F, g1 = (c1 >> 5) & 0x3F, b1 = c1 & 0x1F;
   int r2 = (c2 >> 11) & 0x1F, g2 = (c2 >> 5) & 0x3F, b2 = c2 & 0x1F;
@@ -663,32 +664,20 @@ static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t) { // t: 0..255
   return (uint16_t)((r << 11) | (g << 5) | b);
 }
 
+// Отрисовка громкости с учётом ограничения:
+//   config.store.volume — «сырая» ручка 0..254 (как крутит пользователь);
+//   player.volToI2S()   — фактическое значение на ЦАПе, уже с учётом
+//                         MAX_VOL (программного предела) и station.ovol.
+// Полоса (_volbar) и диалог (_nums) показывают сырую ручку, как и раньше;
+// число внизу (_voltxt) показывает реальное значение на ЦАПе.
+// При выходе за MAX_VOL цвет числа и цифр плавно подкрашивается
+// VOL_OVER_COLOR: чем дальше за предел, тем насыщеннее (t = 0..255).
 void Display::_volume() {
-  
-/*    
- //original
-    if(_volbar) _volbar->setValue(config.store.volume);
-  #ifndef HIDE_VOL
-    if(_voltxt) _voltxt->setText(config.store.volume, voltxtFmt);
-  #endif
-  if(_mode==VOL) {
-    timekeeper.waitAndReturnPlayer(3);
-    _nums->setText(config.store.volume, numtxtFmt);
-  }
- */
- 
- //алиса  с учетом ограничения громкости
- /*
-  Полоса (_volbar) остаётся на шкале 0–254 — она показывает, где крутишь ручка. Менять её не надо.
-  Число внизу (_voltxt) теперь показывает фактическое значение, уходящее в setVolume() ЦАПа — с учётом и MAX_VOL, и station.ovol. 
-  То есть ровно то, что у тебя сейчас печатает Serial.printf в volToI2S().
-  Диалог громкости (_nums) — тоже переведён на реальное значение. 
-  Если хочешь, чтобы в диалоге ручка/число оставались «сырыми» (0–254), а внизу — ЦАП, оставь в _nums прежнее config.store.volume и не трогай ту строку.
- */
-  if(_volbar) _volbar->setValue(config.store.volume);   // полоса — сырая ручка
-  uint8_t dacVol = player.volToI2S(config.store.volume); // реальное число на ЦАПе
 
-  // зона предупреждения: от сырого MAX_VOL до верха ручки (254)
+  if(_volbar) _volbar->setValue(config.store.volume);   // полоса — сырая ручка 0..254
+  uint8_t dacVol = player.volToI2S(config.store.volume); // реальное значение на ЦАПе
+
+  // Позиция в зоне перегруза: 0 до MAX_VOL, далее линейно до 255 при ручке 254
   uint16_t t = 0;
   if (config.store.volume > MAX_VOL)
     t = (uint16_t)(config.store.volume - MAX_VOL) * 255 / (254 - MAX_VOL);
@@ -696,21 +685,17 @@ void Display::_volume() {
 
   #ifndef HIDE_VOL
     if(_voltxt) {
-      _voltxt->setFgColor(volColor);
-      _voltxt->setText(dacVol, voltxtFmt);
+      _voltxt->setFgColor(volColor);          // число внизу — цветом зоны перегруза
+      _voltxt->setText(dacVol, voltxtFmt);    // и показывает именно ЦАП-значение
     }
   #endif
   if(_mode==VOL) {
     timekeeper.waitAndReturnPlayer(3);
-//диалог громкости цвет и цыфры
+    // В диалоге громкости цифры «сырые» (0..254) — так пользователь видит,
+    // где крутит ручка. Цвет тоже подкрашивается за пределом MAX_VOL.
     _nums->setFgColor(blendColor(config.theme.digit, VOL_OVER_COLOR, t));
-   //_nums->setText(player.volToI2S(config.store.volume), numtxtFmt);  //в диалоге ручка/число реальное значение на цап
-    _nums->setText(config.store.volume, numtxtFmt); //в диалоге ручка/число оставались «сырыми» (0–254)
+    _nums->setText(config.store.volume, numtxtFmt);
   }
-
-  /*#ifdef USE_NEXTION
-    nextion.setVol(config.store.volume, _mode == VOL);
-  #endif*/
 }
 
 void Display::flip(){ dsp.flip(); }
