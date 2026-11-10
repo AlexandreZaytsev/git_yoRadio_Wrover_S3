@@ -114,4 +114,6 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/options.h
 - фикс при старте с sd не рисовался VU Meter (слишком быстрый старт)   
    - [x] /src/core/display.cpp строки 311, 327, 471
+- переписан функционал mute усилителя    
+   - [x] добавлены файлы /src/core/ampmute.h и /src/core/ampmute.cpp
 
