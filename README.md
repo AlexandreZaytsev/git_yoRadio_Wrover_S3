@@ -112,5 +112,6 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
    - [x] /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI
    - [x] /src/core/options.h
-
+- фикс при старте с sd не рисовался VU Meter (слишком быстрый старт)   
+   - [x] /src/core/display.cpp строки 311, 327, 471
 

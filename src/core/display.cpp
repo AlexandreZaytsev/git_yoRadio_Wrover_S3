@@ -300,7 +300,17 @@ void Display::_start() {
   if(_weather)  _weather->lock(!config.store.showweather);
   if(_weather && config.store.showweather)  _weather->setText(LANG::const_getWeather);
 
-  if(_vuwidget) _vuwidget->lock();
+//Алиса
+//  if(_vuwidget) _vuwidget->lock();
+
+  // Фикс: на холодном старте с SD плеер начинает играть раньше, чем строится экран.
+  // Событие PSTART при этом теряется, и безусловный lock() оставлял VU заблокированным
+  // до первого захода в плейлист. Поэтому лочим только если VU выключен в настройках
+  // ИЛИ плеер ещё не играет. В WEB-режиме плеер на этот момент ещё не играет —
+  // поведение не меняется, VU там разблокирует PSTART как раньше.
+if(_vuwidget) _vuwidget->lock(!config.store.vumeter || !player.isRunning());
+
+
   if(_rssi)     _setRSSI(WiFi.RSSI());
   #ifndef HIDE_IP
     if(_volip) _volip->setText(config.ipToStr(WiFi.localIP()), iptxtFmt);
@@ -309,6 +319,13 @@ void Display::_start() {
   _volume();
   _station();
   _time(false);
+
+	//алиса: раскладка (VU/часы/погода) по факту — плеер уже мог стартовать с SD
+	// Фикс: при старте сразу в SD часы не переставляются (_swichMode(PLAYER) не вызывается).
+  // Прогоняем раскладку один раз по фактическому состоянию плеера: если он уже играет —
+  // VU разблокируется и часы/погода встанут в VU-позицию, как при возврате из плейлиста.
+  _layoutChange(player.isRunning());
+
   _bootStep = 2;
   pm.on_display_player();
 }
@@ -445,6 +462,15 @@ void Display::loop() {
     return;
   }
   if(displayQueue==NULL || _locked) return;
+
+ 	//алиса: страховка от пропущенного PSTART на старте с SD
+ 	// Страховка от потерянного PSTART при старте с SD: если плеер уже играет,
+  // а VU остался залочен — принудительно прогоняем раскладку (unlock + перестановка часов).
+  // Срабатывает один раз: после unlock() условие становится ложным.
+  // При выключенном VU или выключении через настройки (SHOWVUMETER) не срабатывает никогда.
+  if(_bootStep==2 && _mode==PLAYER && _vuwidget && config.store.vumeter
+     && player.isRunning() && _vuwidget->locked()) _layoutChange(true);
+
   _pager->loop();
 #ifdef USE_NEXTION
   nextion.loop();
@@ -537,6 +563,10 @@ void Display::loop() {
           return;
       }
   }
+
+  //алиса: страховка от пропущенного PSTART на старте с SD
+  //if(_bootStep==2 && _mode==PLAYER && _vuwidget && config.store.vumeter
+  //   && player.isRunning() && _vuwidget->locked()) _layoutChange(true);
 
   dsp.loop();
 /*
