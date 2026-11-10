@@ -15,6 +15,8 @@
 #include "src/displays/nextion.h"
 #endif
 
+#include "core/ampmute.h"          //mute усилителя
+
 #if USE_OTA
 #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
 #include <NetworkUdp.h>
@@ -68,41 +70,9 @@ void setupOTA(){
 }
 #endif
 
-//---------------------------------------------------------
-//const int AMP_MUTE_GPIO = 12;//2;//21;//2;      // Выход на PAM8406
-// Состояние машины состояний для задержки
-enum MuteState {
-  STATE_IDLE,
-  STATE_WAIT_STARTUP,      // ждём 500 мс после старта
-  STATE_WAIT_UNMUTE_CLICK, // ждём 100 мс перед снятием Mute после клика
-  STATE_NORMAL
-};
-MuteState currentState = STATE_WAIT_STARTUP;
-unsigned long stateStartTime = 0;
-//---------------------------------------------------------
-
-
 void setup() {
   Serial.begin(115200);
-
- // Выводим все критические пины
-  Serial.println("DEBUG PINS:");
-  Serial.print("BRIGHTNESS_PIN: "); Serial.println(BRIGHTNESS_PIN);
-  Serial.print("I2C_SCL: "); Serial.println(I2C_SCL);
-  Serial.print("VS1053_DCS: "); Serial.println(VS1053_DCS);
-  Serial.print("VS1053_DREQ: "); Serial.println(VS1053_DREQ);
-  Serial.print("I2S_DOUT: "); Serial.println(I2S_DOUT);
-  Serial.print("I2S_BCLK: "); Serial.println(I2S_BCLK);
-  Serial.print("I2S_LRC: "); Serial.println(I2S_LRC);
-  Serial.print("TS_SDA: "); Serial.println(TS_SDA);
-  Serial.print("TS_SCL: "); Serial.println(TS_SCL);
-  Serial.print("TS_RST: "); Serial.println(TS_RST);
-  Serial.print("TFT_MOSI: "); Serial.println(TFT_MOSI);
-
-
-
-
-
+  ampMute.init(AMP_MUTE_GPIO);     // ДО ветвления, до раннего return в AP-режиме
 
   if(REAL_LEDBUILTIN!=255) pinMode(REAL_LEDBUILTIN, OUTPUT);
   if (yoradio_on_setup) yoradio_on_setup();
@@ -140,30 +110,15 @@ void setup() {
     player.sendCommand({PR_PLAY, config.lastStation()});
   }
   pm.on_end_setup();
-
-//---------------------------------------------------------
-  pinMode(AMP_MUTE_GPIO, OUTPUT);
-  // Начальное состояние — тишина
-  digitalWrite(AMP_MUTE_GPIO, LOW);
-
-
-  Serial.println("Mute ON (initial)");
-  currentState = STATE_WAIT_STARTUP;
-  stateStartTime = millis();            //время старта
-//---------------------------------------------------------
 }
 
 
 void loop() {
-  unsigned long now = millis();         //текущее время
-
+  ampMute.loop();          // мьют усилителя — по состоянию плеера
   timekeeper.loop1();
   telnet.loop();
   if (network.status == CONNECTED || network.status==SDREADY) {
     player.loop();
-
-    digitalWrite(AMP_MUTE_GPIO, HIGH);
-   // digitalWrite(AMP_MUTE_GPIO, LOW);
 
 #if USE_OTA
     ArduinoOTA.handle();

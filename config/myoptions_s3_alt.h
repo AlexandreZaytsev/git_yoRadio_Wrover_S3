@@ -76,7 +76,14 @@ GPIO 19-20: заняты USB
 
 
 /* AMP MUTE */
-#define AMP_MUTE_GPIO       46 //19 
+#ifndef AMP_MUTE_GPIO
+    #define AMP_MUTE_GPIO       46 // пин MUTE усилителя PAM8406
+#endif
+#define AMP_MUTE_ACTIVE_HIGH   true   // HIGH = играть, LOW = тишина
+#define AMP_MUTE_UNMUTE_DELAY  100    // мс после старта звука перед снятием мьюта
+
+
+
 #define MAX_VOL 190                 // потолок громкости, подбери на слух в диапазоне 170–200
 #ifndef VOL_OVER_COLOR
   #define VOL_OVER_COLOR 0xF800     // цвет превышения громкости MAX_VOL - красный, RGB565
