@@ -118,3 +118,4 @@ Reengineering base release yoradio v0.9.693
 - переписан функционал mute усилителя    
    - [x] добавлены файлы /src/core/ampmute.h и /src/core/ampmute.cpp
 
+этот проект уже не интересен проболжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом
