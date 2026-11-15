@@ -2,6 +2,7 @@
 
 
 # git_yoRadio_Wrover_S3
+> Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693  
 
 авторы:
 * **Серега Соколов** - все четко и продуманно - вся схемотехнка, выбор компонентов, софта, 3d печать, пайка, логика идеи, правильные слова и огромная поддержка!!!
@@ -19,7 +20,7 @@ https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
 
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
 
-> Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693  
+## pinout    
 
 esp32 wrover e n8r8    
 [pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
