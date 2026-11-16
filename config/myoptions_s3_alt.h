@@ -98,4 +98,15 @@
   #define VOL_OVER_COLOR 0xF800   // RGB565, красный
 #endif
 
+
+
+/* ---------- Встроенный RGB-LED — отключён ----------
+   На платах S3 (WS2812 обычно на GPIO48) ёРадио по умолчанию
+   использует встроенный LED. USE_BUILTIN_LED false + LED_BUILTIN_S3 255
+   даёт REAL_LEDBUILTIN == 255 — пин не инициализируется вовсе. */
+//#define USE_BUILTIN_LED       false
+//#define LED_BUILTIN_S3        255
+//#define LED_BUILTIN           255
+//#define LED_INVERT            false
+
 #endif

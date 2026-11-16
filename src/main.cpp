@@ -72,6 +72,18 @@ void setupOTA(){
 
 void setup() {
   Serial.begin(115200);
+
+/* ---------- Гашение встроенного RGB-LED — только для S3 ---------- */
+#if defined(ENV_ESP32_WROVER_KIT)
+  /* Wrover: встроенного RGB-LED (WS2812) нет — ничего не делаем */
+#elif defined(ENV_ESP32_S3_DEVKITC_1_ALT)
+  /* Гасим WS2812 на GPIO48: нулевой кадр + удержание линии в LOW,
+     чтобы светодиод не защёлкивал наводки с «висящего» пина */
+  neopixelWrite(48, 0, 0, 0);
+  pinMode(48, OUTPUT);
+  digitalWrite(48, LOW);
+#endif
+
   ampMute.init(AMP_MUTE_GPIO);     // ДО ветвления, до раннего return в AP-режиме
 
   if(REAL_LEDBUILTIN!=255) pinMode(REAL_LEDBUILTIN, OUTPUT);
