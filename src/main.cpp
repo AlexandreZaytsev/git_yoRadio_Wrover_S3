@@ -76,7 +76,8 @@ void setup() {
 /* ---------- Гашение встроенного RGB-LED — только для S3 ---------- */
 #if defined(ENV_ESP32_WROVER_KIT)
   /* Wrover: встроенного RGB-LED (WS2812) нет — ничего не делаем */
-#elif defined(ENV_ESP32_S3_DEVKITC_1_ALT)
+//#elif defined(ENV_ESP32_S3_DEVKITC_1_ALT)
+#elif defined(ENV_ESP32_S3_DEVKITC_1_ALT) || defined(ENV_ESP32_S3_KIT)
   /* Гасим WS2812 на GPIO48: нулевой кадр + удержание линии в LOW,
      чтобы светодиод не защёлкивал наводки с «висящего» пина */
   neopixelWrite(48, 0, 0, 0);
