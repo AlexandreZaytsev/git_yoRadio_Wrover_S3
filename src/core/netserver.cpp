@@ -622,7 +622,20 @@ void handleIndex(AsyncWebServerRequest * request) {
     if(request->url()=="/" && request->method() == HTTP_POST) {
       if(request->arg("ssid")!="" && request->arg("pass")!=""){
         netserver.nsBuf[0]='\0';
-        snprintf(netserver.nsBuf, sizeof(netserver.nsBuf), "%s\t%s", request->arg("ssid").c_str(), request->arg("pass").c_str());
+//алиса
+//        snprintf(netserver.nsBuf, sizeof(netserver.nsBuf), "%s\t%s", request->arg("ssid").c_str(), request->arg("pass").c_str());
+  // было:
+  // snprintf(netserver.nsBuf, sizeof(netserver.nsBuf), "%s\t%s",
+  //     request->arg("ssid").c_str(), request->arg("pass").c_str());
+  // ИЗМЕНЕНО: добавили третью колонку — дескриптор.
+  // Если поля label в форме нет, arg() вернёт "" и получится хвост "ssid\tpass\t" —
+  // новый parseSsid это корректно съест (label останется пустым).
+  snprintf(netserver.nsBuf, sizeof(netserver.nsBuf), "%s\t%s\t%s",
+      request->arg("ssid").c_str(),
+      request->arg("pass").c_str(),
+      request->arg("label").c_str());
+//Одно косвенное место: глянь в netserver.h, что nsBuf вмещает хотя бы ~90 символов — новая строка максимально занимает 85. Скорее всего, там запас есть (в буфер пишутся и строки плейлиста), но проверить стоит.      
+      
         request->redirect("/");
         config.saveWifiFromNextion(netserver.nsBuf);
         return;

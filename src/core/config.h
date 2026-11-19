@@ -152,10 +152,13 @@ struct station_t
   int  ovol;
 };
 
+//алиса
+//добавляем третий параметр
 struct neworkItem
 {
   char ssid[30];
   char password[40];
+  char label[16];   // короткий дескриптор, может быть пустым
 };
 
 class Config {
@@ -205,7 +208,12 @@ class Config {
     bool parseCSV(const char* line, char* name, char* url, int &ovol);
     bool parseJSON(const char* line, char* name, char* url, int &ovol);
     bool parseWsCommand(const char* line, char* cmd, char* val, uint8_t cSize);
-    bool parseSsid(const char* line, char* ssid, char* pass);
+
+//алиса 
+//В классе Config меняем сигнатуру парсера — третий аргумент с умолчанием, чтобы старые вызовы parseSsid(line, ssid, pass) продолжали компилироваться:
+    //    bool parseSsid(const char* line, char* ssid, char* pass);
+    bool parseSsid(const char* line, char* ssid, char* pass, char* label = nullptr);
+
     bool loadStation(uint16_t station);
     bool initNetwork();
     bool saveWifi();

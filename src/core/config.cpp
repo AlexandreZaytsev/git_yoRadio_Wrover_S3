@@ -877,6 +877,9 @@ bool Config::parseWsCommand(const char* line, char* cmd, char* val, uint8_t cSiz
   return true;
 }
 
+//алиса
+//полная замена Замена реализации parseSsid. Ключевое: старый лимит strlen(line) > 71 рассчитан на две колонки и молча отбрасывал бы строки с третьей — поэтому он пересчитан (29 + 1 + 39 + 1 + 15 = 85, с запасом 87):
+/*
 bool Config::parseSsid(const char* line, char* ssid, char* pass) {
   char *tmpe;
   tmpe = strstr(line, "\t");
@@ -889,6 +892,35 @@ bool Config::parseSsid(const char* line, char* ssid, char* pass) {
   strlcpy(pass, line + pos + 1, strlen(line) - pos);
   return true;
 }
+*/
+// Формат строки wifi.csv: "ssid<TAB>password[<TAB>label]"
+// Третьей колонки может не быть — старые двухколоночные файлы остаются рабочими.
+//Важно: strlcpy(pass, p2, tmpe2 - p2 + 1) — если пароля нет между двумя табами (пустое поле), пароль станет пустой строкой. Это осознанное поведение: строка с пустым паролем для открытой сети сохранится, но подключиться к ней не выйдет — при желании можно добавить if (pass[0]=='\0') return false;.
+bool Config::parseSsid(const char* line, char* ssid, char* pass, char* label) {
+  if (label) label[0] = '\0';                    // <-- ДОБАВЛЕНО: по умолчанию дескриптор пустой
+  char *tmpe = strstr(line, "\t");
+  if (tmpe == NULL) return false;
+  uint16_t pos = tmpe - line;
+  // было: if (pos > 29 || strlen(line) > 71) return false;
+  // ИЗМЕНЕНО: 87 = 29 (ssid) + 1 (таб) + 39 (пароль) + 1 (таб) + 15 (дескриптор) + 2 (запас)
+  if (pos > 29 || strlen(line) > 87) return false;
+  memset(ssid, 0, 30);
+  strlcpy(ssid, line, pos + 1);
+  const char* p2 = tmpe + 1;
+  char *tmpe2 = strstr(p2, "\t");                // <-- ДОБАВЛЕНО: ищем второй таб — конец пароля
+  memset(pass, 0, 40);
+  if (tmpe2) {                                   // есть третья колонка
+    strlcpy(pass, p2, tmpe2 - p2 + 1);
+    if (label) {
+      memset(label, 0, 16);
+      strlcpy(label, tmpe2 + 1, 16);             // дескриптор до конца строки
+    }
+  } else {                                       // старый формат: только ssid<TAB>pass
+    strlcpy(pass, p2, strlen(p2) + 1);
+  }
+  return true;
+}
+
 
 bool Config::saveWifiFromNextion(const char* post){
   File file = SPIFFS.open(SSIDS_PATH, "w");
@@ -918,6 +950,9 @@ void Config::setTimeConf(){
   }
 }
 
+
+//алиса
+/*
 bool Config::initNetwork() {
   File file = SPIFFS.open(SSIDS_PATH, "r");
   if (!file || file.isDirectory()) {
@@ -937,6 +972,31 @@ bool Config::initNetwork() {
   file.close();
   return true;
 }
+*/
+//В функции чтения wifi.csv добавляем буфер дескриптора и копирование его в массив:
+bool Config::initNetwork() {
+  File file = SPIFFS.open(SSIDS_PATH, "r");
+  if (!file || file.isDirectory()) {
+    return false;
+  }
+  // было: char ssidval[30], passval[40];
+  char ssidval[30], passval[40], labelval[16];            // <-- ИЗМЕНЕНО: буфер под дескриптор
+  uint8_t c = 0;
+  while (file.available() && c < 10) {
+    if (parseSsid(file.readStringUntil('\n').c_str(), ssidval, passval, labelval)) {  // <-- ИЗМЕНЕНО: третий аргумент
+      strlcpy(ssids[c].ssid, ssidval, 30);
+      strlcpy(ssids[c].password, passval, 40);
+      strlcpy(ssids[c].label, labelval, 16);              // <-- ДОБАВЛЕНО: сохраняем дескриптор
+      ssidsCount++;
+      c++;
+    }
+  }
+  file.close();
+  return true;
+}
+//Дополнительно проверь по поиску ssids[ в config.cpp: во всех местах, где элемент заполняется в обход парсера (обработчики сохранения сети), после заполнения ssid/password добавляй:
+//ssids[i].label[0] = '\0';   // <-- ДОБАВЛЕНО: сбрасываем дескриптор, чтобы в 
+
 
 void Config::setBrightness(bool dosave){
 #if BRIGHTNESS_PIN!=255

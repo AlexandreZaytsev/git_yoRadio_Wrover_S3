@@ -40,7 +40,16 @@ void MyNetwork::WiFiReconnected(WiFiEvent_t event, WiFiEventInfo_t info){
 
 void MyNetwork::WiFiLostConnection(WiFiEvent_t event, WiFiEventInfo_t info){
   if(!network.beginReconnect){
-    Serial.printf("Lost connection, reconnecting to %s...\n", config.ssids[config.store.lastSSID-1].ssid);
+//алиса
+//    Serial.printf("Lost connection, reconnecting to %s...\n", config.ssids[config.store.lastSSID-1].ssid);
+// было:
+// Serial.printf("Lost connection, reconnecting to %s...\n", config.ssids[config.store.lastSSID-1].ssid);
+// ИЗМЕНЕНО: то же правило выбора имени
+Serial.printf("Lost connection, reconnecting to %s...\n",
+    config.ssids[config.store.lastSSID-1].label[0]
+        ? config.ssids[config.store.lastSSID-1].label
+        : config.ssids[config.store.lastSSID-1].ssid);
+
     if(config.getMode()==PM_SDCARD) {
       network.status=SDREADY;
       display.putRequest(NEWIP, 0);
@@ -71,8 +80,15 @@ bool MyNetwork::wifiBegin(bool silent){
   */
   while (true) {
     if(!silent){
-      Serial.printf("##[BOOT]#\tAttempt to connect to %s\n", config.ssids[ls].ssid);
-      Serial.print("##[BOOT]#\t");
+//алиса
+//     Serial.printf("##[BOOT]#\tAttempt to connect to %s\n", config.ssids[ls].ssid);
+// было:
+// Serial.printf("##[BOOT]#\tAttempt to connect to %s\n", config.ssids[ls].ssid);
+// ИЗМЕНЕНО: в логе показываем дескриптор, если он задан
+    Serial.printf("##[BOOT]#\tAttempt to connect to %s\n",
+    config.ssids[ls].label[0] ? config.ssids[ls].label : config.ssids[ls].ssid);
+
+    Serial.print("##[BOOT]#\t");
       display.putRequest(BOOTSTRING, ls);
     }
     WiFi.disconnect(true, true); //disconnect & erase internal credentials https://github.com/e2002/yoradio/pull/164/commits/89d8b4450dde99cd7930b84bb14d81dab920b879

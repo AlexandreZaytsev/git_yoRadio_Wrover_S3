@@ -36,8 +36,10 @@ input[type=text],input[type=password]{width:170px;background:#272727;color:#e3d2
 <hr />
 <form name="wifiform" method="post" enctype="multipart/form-data">
 <span>-= OPTIONAL =-<br />If you can't connect from PC to 192.168.4.1 address<br />setup WiFi connection first</span>
-<div class="flex"><div><label for="ssid">ssid:</label><input type="text" id="ssid" name="ssid" value="" maxlength="30" autocomplete="off"></div>
+<div class="flex">
+<div><label for="ssid">ssid:</label><input type="text" id="ssid" name="ssid" value="" maxlength="30" autocomplete="off"></div>
 <div><label for="pass">pass:</label><input type="password" id="pass" name="pass" value="" maxlength="40" autocomplete="off"></div>
+<div><label for="label">label:</label><input type="text" id="label" name="ssid" value="" maxlength="15" autocomplete="off" placeholder="Короткое имя"></div>
 </div>
 <p><input type="submit" name="submit" value="Save Credentials"></p>
 </form>

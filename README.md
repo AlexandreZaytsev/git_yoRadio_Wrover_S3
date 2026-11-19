@@ -174,5 +174,18 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/display.cpp строки 311, 327, 471
 - переписан функционал mute усилителя    
    - [x] добавлены файлы /src/core/ampmute.h и /src/core/ampmute.cpp
+- добавление дескриптора wifi сети
+   - [x] /src/core/config.h в struct neworkItem добавлен дескриптор
+   - [x] /src/core/config.h изменена сигнатура bool parseSsid
+   - [x] /src/core/config.cpp замена реализации bool Config::parseSsid 
+   - [x] /src/core/config.cpp изменена функция 
+   bool Config::initNetwork() 
+   - [x] /src/core/netserver.cpp изменена функция void handleIndex(AsyncWebServerRequest * request)
+   - [x] /src/core/netserver.h в переменную extern добавлен блок (<div><label for="label">label:</label><input type="text" id="label" name="ssid" value="" maxlength="15" autocomplete="off" placeholder="Короткое имя"></div>)
+   - [x] /src/core/network.cpp изменена функция bool MyNetwork::wifiBegin(bool silent)
+   - [x] /src/core/network.cpp изменена функция void MyNetwork::WiFiLostConnection(WiFiEvent_t event, WiFiEventInfo_t info)
+   - [x] /data/www/script.js.gz изменена функция function handleWiFiData(fileData)
+   - [x] /data/www/script.js.gz изменена функция function submitWiFi()
+   - [x] /data/www/options.html.gz ljдобавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом
