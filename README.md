@@ -187,5 +187,15 @@ Reengineering base release yoradio v0.9.693
    - [x] /data/www/script.js.gz изменена функция function handleWiFiData(fileData)
    - [x] /data/www/script.js.gz изменена функция function submitWiFi()
    - [x] /data/www/options.html.gz ljдобавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
+- отображение дескриптора wifi сети вместо имени
+   - [x] /src/core/config.h расширен class Config {
+   - [x] /src/core/config.cpp добавлена константа const char* Config::labelBySsid(const char* ssid){
+   - [x] /src/core/display.cpp исправлена заглушка void Display::_swichMode(displayMode_e newmode) {
+   - [x] /src/core/display.cpp исправлена обработка case BOOTSTRING
+- показать инфо экран в браузере команда http://<ip-радио>/?dspinfo=1  
+   - [x] /src/core/commandhandler.cpp в конце exec
+   - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
+   - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
+   - [x] /src/core/display.cpp дополнена функция void Display::loop() {
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом

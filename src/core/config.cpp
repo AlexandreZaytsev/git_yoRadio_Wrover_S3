@@ -995,8 +995,16 @@ bool Config::initNetwork() {
   return true;
 }
 //Дополнительно проверь по поиску ssids[ в config.cpp: во всех местах, где элемент заполняется в обход парсера (обработчики сохранения сети), после заполнения ssid/password добавляй:
-//ssids[i].label[0] = '\0';   // <-- ДОБАВЛЕНО: сбрасываем дескриптор, чтобы в 
+//ssids[i].label[0] = '\0';   // сбрасываем дескриптор, чтобы он не подхватился из старых данных
 
+//алиса: возвращает дескриптор сети по SSID; если дескриптор не задан — сам SSID
+const char* Config::labelBySsid(const char* ssid){
+  for(uint8_t i = 0; i < ssidsCount; i++){
+    if(strcmp(ssids[i].ssid, ssid) == 0 && ssids[i].label[0] != '\0')
+      return ssids[i].label;
+  }
+  return ssid;
+}
 
 void Config::setBrightness(bool dosave){
 #if BRIGHTNESS_PIN!=255

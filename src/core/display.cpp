@@ -390,7 +390,29 @@ void Display::_swichMode(displayMode_e newmode) {
   if (newmode == UPDATING)  _showDialog(LANG::const_DlgUpdate);
   if (newmode == SLEEPING)  _showDialog("SLEEPING");
   if (newmode == SDCHANGE)  _showDialog(LANG::const_waitForSD);
-  if (newmode == INFO || newmode == SETTINGS || newmode == TIMEZONE || newmode == WIFI) _showDialog(LANG::const_DlgNextion);
+  
+  //if (newmode == INFO || newmode == SETTINGS || newmode == TIMEZONE || newmode == WIFI) _showDialog(LANG::const_DlgNextion);
+    //алиса: INFO — дескриптор сети (или SSID, если не задан); IP и RSSI покажет футер
+  //if (newmode == INFO) _showDialog(config.labelBySsid(WiFi.SSID().c_str()));
+  //алиса: дополняем ветку сохранением времени
+  //if (newmode == INFO) { _infoShown = millis(); _showDialog(config.labelBySsid(WiFi.SSID().c_str())); }
+//алиса: INFO — дескриптор сети + SSID + свободная память; IP и RSSI покажет футер
+  if (newmode == INFO) {
+    _infoShown = millis();
+    char info[80];
+    snprintf(info, sizeof(info), "%s | %s | %u KB",
+             config.labelBySsid(WiFi.SSID().c_str()),
+             WiFi.SSID().c_str(),
+             (unsigned)(ESP.getFreeHeap() / 1024));
+    _showDialog(info);
+  }
+
+
+
+
+  if (newmode == SETTINGS || newmode == TIMEZONE || newmode == WIFI) _showDialog(LANG::const_DlgNextion);
+ 
+  
   if (newmode == NUMBERS) _showDialog("");
   if (newmode == STATIONS) {
     _pager->setPage( pages[PG_PLAYLIST]);
@@ -453,6 +475,10 @@ void Display::_layoutChange(bool played){
 }
 
 void Display::loop() {
+
+//алиса: INFO-экран сам возвращается в плеер через 10 секунд
+  if(_mode == INFO && _infoShown != 0 && millis() - _infoShown > 10000) { _infoShown = 0; returnPlayer(); }
+
   if(_bootStep==0) {
     _pager->begin();
     _bootScreen();
@@ -526,7 +552,11 @@ void Display::loop() {
           break;
         }
         case BOOTSTRING: {
-          if(_bootstring) _bootstring->setText(config.ssids[request.payload].ssid, LANG::bootstrFmt);
+         // if(_bootstring) _bootstring->setText(config.ssids[request.payload].ssid, LANG::bootstrFmt);
+          //алиса: на бут-экране показываем дескриптор вместо «сырого» SSID
+          if(_bootstring) _bootstring->setText(config.labelBySsid(config.ssids[request.payload].ssid), LANG::bootstrFmt);
+          break;
+
           /*#ifdef USE_NEXTION
             char buf[50];
             snprintf(buf, 50, bootstrFmt, config.ssids[request.payload].ssid);

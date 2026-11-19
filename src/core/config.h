@@ -166,6 +166,10 @@ class Config {
     config_t store;
     station_t station;
     theme_t   theme;
+
+    //алиса
+    const char* labelBySsid(const char* ssid);
+    
 #if IR_PIN!=255
     int irindex;
     uint8_t irchck;

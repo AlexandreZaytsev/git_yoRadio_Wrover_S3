@@ -120,6 +120,11 @@ bool CommandHandler::exec(const char *command, const char *value, uint8_t cid) {
     return true;
   }
   
+
+    //алиса: показать INFO-экран (дескриптор сети, IP и RSSI в футере)
+  if (strEquals(command, "dspinfo")) { display.putRequest(NEWMODE, INFO); return true; }
+
+
   return false;
 }
 
