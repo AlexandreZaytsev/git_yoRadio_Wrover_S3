@@ -10,29 +10,29 @@
 * **Алиса Ай** - реинжиниринг/хакинг - наш чел! полностью перелопатила исходный проект Arduino ёРадио, помогла перенести его на VSCode Platformio, нашла все глюки, испонила все хотелки, подключила SD в режиме SDIO (я и слов то таких не знаю) - короче без нее - наш проект появился бы на пару лет позже!!! Супер - пока бесплатна!
 
 первая версия на врувере  (дисплей ILI9341 86мм, 2x энкодера, ЦАП pcm5102A, усилок HT8698)  
-``` platformio.ini
+` platformio.ini
 default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
-;default_envs = esp32-s3-devkitc-1-alt
+;default_envs = esp32-s3-devkitc-1-alt`
 
-``` config/myoptions_wrover.h
-;SDC_CS ;SDCARD — не используется в этой сборке (SDC_CS закомментирован). 
+` config/myoptions_wrover.h
+;SDC_CS ;SDCARD — не используется в этой сборке (SDC_CS закомментирован).` 
 
 ![v1](/hardware/release_v1.png)    
 
 https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
 
 вторая версия на альтернативной s3 (дисплей ILI9341 81мм, 2x энкодера, ЦАП pcm5102A, micro SD SDIO, усилок HT8698)  
-``` platformio.ini
+` platformio.ini
 ;default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
-default_envs = esp32-s3-devkitc-1-alt
+default_envs = esp32-s3-devkitc-1-alt`
 
-``` config/myoptions_s3_alt.h
+` config/myoptions_s3_alt.h
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49
+#define SDC_CS      49`
 
 ![3d](/hardware/kompas_3d/asm.png)    
 ![v1](/hardware/release_v2.png)    
@@ -40,16 +40,16 @@ default_envs = esp32-s3-devkitc-1-alt
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
 
 третья версия на классической s3 (дисплей ST7735S, 2x энкодера, ЦАП pcm5102A, micro SD SDIO, усилок HT8698)  
-``` platformio.ini
+` platformio.ini
 ;default_envs = esp32-wrover-kit
 default_envs = esp32-s3-kit
-;default_envs = esp32-s3-devkitc-1-alt
+;default_envs = esp32-s3-devkitc-1-alt`
 
-``` config/myoptions_s3.h
+` config/myoptions_s3.h
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49
+#define SDC_CS      49`
 
 ## pinout    
 
