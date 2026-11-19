@@ -9,60 +9,61 @@
 * **Александр Зайцев** - чисто по: -порисовать, поболтать, помоделировать, попрограммировать, попаять - не вдаваясь особенно в детали 
 * **Алиса Ай** - реинжиниринг/хакинг - наш чел! полностью перелопатила исходный проект Arduino ёРадио, помогла перенести его на VSCode Platformio, нашла все глюки, испонила все хотелки, подключила SD в режиме SDIO (я и слов то таких не знаю) - короче без нее - наш проект появился бы на пару лет позже!!! Супер - пока бесплатна!
 
-первая версия на врувере  (дисплей ILI9341 86мм, 2x энкодера, ЦАП pcm5102A, усилок HT8698)  
-```platformio.ini
+## первая версия на врувере    
+(esp32 wrover e n8r8, дисплей ILI9341 86мм, 2x энкодера, ЦАП pcm5102A, усилок HT8698)  
+platformio.ini
+```
 default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
 ;default_envs = esp32-s3-devkitc-1-alt
 ```
-
-```config/myoptions_wrover.h
-;SDC_CS ;SDCARD — не используется в этой сборке (SDC_CS закомментирован).
+config/myoptions_wrover.h
+```
+//SDC_CS ;SDCARD — не используется в этой сборке (SDC_CS закомментирован).
 ``` 
-
 ![v1](/hardware/release_v1.png)    
-
 https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
+pinout
+[pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
+<img width="1359" height="391" alt="image" src="https://github.com/user-attachments/assets/16f74f1d-b205-40cc-8eb1-5b08f8e9d965" />    
 
-вторая версия на альтернативной s3 (дисплей ILI9341 81мм, 2x энкодера, ЦАП pcm5102A, micro SD SDIO, усилок HT8698)  
-` platformio.ini
+## вторая версия на альтернативной s3    
+(esp32 s3 alt1 n16r8,дисплей ILI9341 81мм, 2x энкодера, ЦАП pcm5102A, micro SD SDIO, усилок HT8698)  
+platformio.ini
+```
 ;default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
 default_envs = esp32-s3-devkitc-1-alt`
-
-` config/myoptions_s3_alt.h
+```
+config/myoptions_s3_alt.h
+```
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
 #define SDC_CS      49`
-
+```
 ![3d](/hardware/kompas_3d/asm.png)    
 ![v1](/hardware/release_v2.png)    
-
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
-
-третья версия на классической s3 (дисплей ST7735S, 2x энкодера, ЦАП pcm5102A, micro SD SDIO, усилок HT8698)  
-` platformio.ini
-;default_envs = esp32-wrover-kit
-default_envs = esp32-s3-kit
-;default_envs = esp32-s3-devkitc-1-alt`
-
-` config/myoptions_s3.h
-// SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
-// включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
-// пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49`
-
-## pinout    
-
-esp32 wrover e n8r8    
-[pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
-<img width="1359" height="391" alt="image" src="https://github.com/user-attachments/assets/16f74f1d-b205-40cc-8eb1-5b08f8e9d965" />
-
-esp32 s3 n16r8     
+pinout
 [chip and lcd from GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board](https://github.com/profharris/GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board/blob/main/README.md)    
 [pinout ESP32-S3-DevKitC-1 v1.1](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.0.html)
 <img width="1491" height="479" alt="image" src="https://github.com/user-attachments/assets/954696eb-6092-46a1-a627-f03162bf92f7" />
+
+## третья версия на классической s3    
+(дисплей ST7735S, 2x энкодера, ЦАП pcm5102A, micro SD SDIO, усилок HT8698)  
+platformio.ini
+```
+;default_envs = esp32-wrover-kit
+default_envs = esp32-s3-kit
+;default_envs = esp32-s3-devkitc-1-alt`
+```
+config/myoptions_s3.h
+// SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
+// включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
+// пин никуда не подключается и ни с чем не конфликтует.
+#define SDC_CS      49`
+```
 
 Железо в каталоге \hardware    
 ---
