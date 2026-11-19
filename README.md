@@ -197,5 +197,12 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
    - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
    - [x] /src/core/display.cpp дополнена функция void Display::loop() {
+- рисуем свою страницу инфо
+   - [x] /src/core/common.h добавляем enum pages_e
+   - [x] /src/core/display.h расширен private class Display на FillWidget и TextWidget 
+   - [x] /src/core/display.cpp Page *pages[] расширяем на 5ть страниц 
+   - [x] /src/core/display.cpp Page *pages[] меняем _buildPager()
+   - [x] /src/core/display.cpp Page *pages[] меняем _swichMode()
+
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом

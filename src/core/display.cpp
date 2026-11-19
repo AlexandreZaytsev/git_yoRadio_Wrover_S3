@@ -71,7 +71,11 @@ void Display::_createDspTask(){
 //============================================================================================================================
 DspCore dsp;
 
-Page *pages[] = { new Page(), new Page(), new Page(), new Page() };
+//Page *pages[] = { new Page(), new Page(), new Page(), new Page() };
+//алиса
+//расширяем на 5 мстраниц
+Page *pages[] = { new Page(), new Page(), new Page(), new Page(), new Page() };
+
 
 #if !((DSP_MODEL==DSP_ST7735 && DTYPE==INITR_BLACKTAB) || DSP_MODEL==DSP_ST7789 || DSP_MODEL==DSP_ST7796 || DSP_MODEL==DSP_ILI9488 || DSP_MODEL==DSP_ILI9486 || DSP_MODEL==DSP_ILI9341 || DSP_MODEL==DSP_ILI9225)
   #undef  BITRATE_FULL
@@ -241,6 +245,71 @@ void Display::_buildPager(){
   #endif
   pages[PG_PLAYLIST]->addWidget(_plcurrent);
   pages[PG_PLAYLIST]->addWidget(_plwidget);
+
+
+//алиса: страница INFO — фон, крупный дескриптор, под ним SSID, IP, сигнал, память
+  FillConfig infobgConf = { {0, 0, 1, WA_LEFT}, (uint16_t)dsp.width(), (uint16_t)dsp.height() };
+  _infobg = new FillWidget(infobgConf, config.theme.background);
+  pages[PG_INFO]->addWidget(_infobg);
+
+
+  /*
+  _infoTitle = new TextWidget({0, (uint16_t)(dsp.height()/4), 2, WA_CENTER}, 40, true, config.theme.meta, config.theme.background);
+  _infoSsid  = new TextWidget({0, (uint16_t)(dsp.height()/4 + 24), 1, WA_CENTER}, 30, false, config.theme.title1, config.theme.background);
+  _infoIp    = new TextWidget({0, (uint16_t)(dsp.height()/4 + 36), 1, WA_CENTER}, 20, false, config.theme.clock, config.theme.background);
+  _infoRssi  = new TextWidget({0, (uint16_t)(dsp.height()/4 + 48), 1, WA_CENTER}, 10, false, config.theme.rssi, config.theme.background);
+  _infoHeap  = new TextWidget({0, (uint16_t)(dsp.height()/4 + 60), 1, WA_CENTER}, 12, false, config.theme.heap, config.theme.background);
+*/
+/*
+const uint16_t baseY = (uint16_t)(dsp.height() * 0.25); // старт чуть выше центра
+  const uint16_t lineH = 28;                              // шаг между строками (подбирай под свой экран)
+
+  // Заголовок — крупный
+  _infoTitle = new TextWidget({0, baseY, 4, WA_CENTER}, 60, true, config.theme.meta, config.theme.background);
+
+  // SSID — средний
+  _infoSsid  = new TextWidget({0, baseY + lineH, 2, WA_CENTER}, 30, false, config.theme.title1, config.theme.background);
+
+  // IP — средний
+  _infoIp    = new TextWidget({0, baseY + 2 * lineH, 2, WA_CENTER}, 24, false, config.theme.clock, config.theme.background);
+
+  // RSSI — чуть меньше
+  _infoRssi  = new TextWidget({0, baseY + 3 * lineH, 1, WA_CENTER}, 16, false, config.theme.rssi, config.theme.background);
+
+  // Heap — чуть меньше
+  _infoHeap  = new TextWidget({0, baseY + 4 * lineH, 1, WA_CENTER}, 16, false, config.theme.heap, config.theme.background);
+*/
+  // Высота строки примерно = textsize * 8 пикселей (шрифт 5x7) + зазор
+  const uint16_t titleSize = 2;   // заголовок
+  const uint16_t lineSize  = 1;   // данные
+
+  uint16_t titleH = titleSize * 10;           // высота строки заголовка
+  uint16_t lineH  = lineSize * 8 + 6;         // высота строки данных + отступ
+
+  // Всего строк данных: SSID, IP, RSSI, HEAP
+  uint16_t blockH = titleH + 4 * lineH + 8;   // +8 = зазор после заголовка
+  uint16_t topY   = (dsp.height() > blockH) ? (dsp.height() - blockH) / 2 : 0;
+
+  // Заголовок — по центру, крупно
+  _infoTitle = new TextWidget({0, topY, titleSize, WA_CENTER}, 60, true, config.theme.meta, config.theme.background);
+
+  // Данные — с лёгким отступом слева, ровной колонкой
+  uint16_t y = topY + titleH + 8;
+  _infoSsid  = new TextWidget({4, y,            lineSize, WA_LEFT}, 30, false, config.theme.title1, config.theme.background);
+  _infoIp    = new TextWidget({4, y + lineH,    lineSize, WA_LEFT}, 20, false, config.theme.clock,  config.theme.background);
+  _infoRssi  = new TextWidget({4, y + 2*lineH,  lineSize, WA_LEFT}, 10, false, config.theme.rssi,   config.theme.background);
+  _infoHeap  = new TextWidget({4, y + 3*lineH,  lineSize, WA_LEFT}, 12, false, config.theme.heap,   config.theme.background);
+
+
+
+  pages[PG_INFO]->addWidget(_infoTitle);
+  pages[PG_INFO]->addWidget(_infoSsid);
+  pages[PG_INFO]->addWidget(_infoIp);
+  pages[PG_INFO]->addWidget(_infoRssi);
+  pages[PG_INFO]->addWidget(_infoHeap);
+
+
+
   for(const auto& p: pages) _pager->addPage(p);
 }
 
@@ -343,6 +412,12 @@ void Display::_swichMode(displayMode_e newmode) {
     nextion.putRequest({NEWMODE, newmode});
   #endif
   if (newmode == _mode || (network.status != CONNECTED && network.status != SDREADY)) return;
+
+//алиса
+ displayMode_e oldmode = _mode;  // сначала запомнить прошлый режим
+
+
+
   _mode = newmode;
   dsp.setScrollId(NULL);
   if (newmode == PLAYER) {
@@ -361,6 +436,10 @@ void Display::_swichMode(displayMode_e newmode) {
     _meta->setText(config.station.name);
     _nums->setText("");
     config.isScreensaver = false;
+
+//алиса
+ if (oldmode == INFO) dsp.fillRect(0, 0, dsp.width(), dsp.height(), config.theme.background);
+
     _pager->setPage( pages[PG_PLAYER]);
     config.setDspOn(config.store.dspon, false);
     pm.on_display_player();
@@ -397,7 +476,8 @@ void Display::_swichMode(displayMode_e newmode) {
   //алиса: дополняем ветку сохранением времени
   //if (newmode == INFO) { _infoShown = millis(); _showDialog(config.labelBySsid(WiFi.SSID().c_str())); }
 //алиса: INFO — дескриптор сети + SSID + свободная память; IP и RSSI покажет футер
-  if (newmode == INFO) {
+/*  
+if (newmode == INFO) {
     _infoShown = millis();
     char info[80];
     snprintf(info, sizeof(info), "%s | %s | %u KB",
@@ -406,7 +486,20 @@ void Display::_swichMode(displayMode_e newmode) {
              (unsigned)(ESP.getFreeHeap() / 1024));
     _showDialog(info);
   }
-
+*/
+//алиса: INFO — отдельная страница: дескриптор крупно, ниже SSID, IP, сигнал, память
+  if (newmode == INFO) {
+    _infoShown = millis();
+    char buf[24];
+    _infoTitle->setText(config.labelBySsid(WiFi.SSID().c_str()));
+    _infoSsid->setText(WiFi.SSID().c_str());
+    _infoIp->setText(config.ipToStr(WiFi.localIP()));
+    snprintf(buf, sizeof(buf), "%d dBm", (int)WiFi.RSSI());
+    _infoRssi->setText(buf);
+    snprintf(buf, sizeof(buf), "Heap: %u KB", (unsigned)(ESP.getFreeHeap() / 1024));
+    _infoHeap->setText(buf);
+    _pager->setPage( pages[PG_INFO]);
+  }
 
 
 

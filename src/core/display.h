@@ -49,6 +49,11 @@ class Display {
     PlayListWidget *_plwidget;
     BitrateWidget *_fullbitrate;
     FillWidget *_metabackground, *_plbackground;
+
+//алиса
+    FillWidget *_infobg;
+    TextWidget *_infoTitle, *_infoSsid, *_infoIp, *_infoRssi, *_infoHeap;
+
     SliderWidget *_volbar, *_heapbar;
     Pager *_pager;
     Page *_footer;
