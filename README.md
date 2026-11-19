@@ -23,7 +23,7 @@ config/myoptions_wrover.h
 ``` 
 ![v1](/hardware/release_v1.png)    
 https://github.com/user-attachments/assets/2cd889ca-598d-4703-a9b4-8989fbc78619
-pinout
+pinout (/hardware/youradio Wrover_S3-pinout.xlsx)
 [pinout ESP32-DevKitC V4](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html#overview)
 <img width="1359" height="391" alt="image" src="https://github.com/user-attachments/assets/16f74f1d-b205-40cc-8eb1-5b08f8e9d965" />    
 
@@ -45,7 +45,7 @@ config/myoptions_s3_alt.h
 ![3d](/hardware/kompas_3d/asm.png)    
 ![v1](/hardware/release_v2.png)    
 https://github.com/user-attachments/assets/9a0339bc-2b3c-4589-a19d-a416dd21c862        
-pinout
+pinout (/hardware/youradio Wrover_S3-pinout.xlsx)
 [chip and lcd from GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board](https://github.com/profharris/GOOUUU-Tech-ESP32-S3-CAM-Expansion-Board/blob/main/README.md)    
 [pinout ESP32-S3-DevKitC-1 v1.1](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.0.html)
 <img width="1491" height="479" alt="image" src="https://github.com/user-attachments/assets/954696eb-6092-46a1-a627-f03162bf92f7" />
@@ -65,6 +65,8 @@ config/myoptions_s3.h
 // пин никуда не подключается и ни с чем не конфликтует.
 #define SDC_CS      49`
 ```
+pinout (/hardware/youradio Wrover_S3-pinout.xlsx)
+
 
 Прошивка    
 ---
