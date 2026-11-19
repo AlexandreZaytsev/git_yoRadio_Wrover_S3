@@ -10,15 +10,13 @@
 * **Алиса Ай** - реинжиниринг/хакинг - наш чел! полностью перелопатила исходный проект Arduino ёРадио, помогла перенести его на VSCode Platformio, нашла все глюки, испонила все хотелки, подключила SD в режиме SDIO (я и слов то таких не знаю) - короче без нее - наш проект появился бы на пару лет позже!!! Супер - пока бесплатна!
 
 первая версия на врувере  (дисплей ILI9341 86мм, 2x энкодера, ЦАП pcm5102A, усилок HT8698)  
-`platformio.ini`
-```
+```platformio.ini
 default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
 ;default_envs = esp32-s3-devkitc-1-alt
 ```
 
-`config/myoptions_wrover.h`
-```
+```config/myoptions_wrover.h
 ;SDC_CS ;SDCARD — не используется в этой сборке (SDC_CS закомментирован).
 ``` 
 
