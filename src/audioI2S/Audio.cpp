@@ -185,9 +185,9 @@ Audio::Audio(bool internalDAC /* = false */, uint8_t channelEnabled /* = I2S_DAC
 #ifdef OLD_DMABUF_PARAMS
     m_i2s_config.dma_buf_count        = 16;    // 4×512×16=32768
 #else
-    m_i2s_config.dma_buf_count        = psramInit()?16:DMA_BUFCOUNT;
+    m_i2s_config.dma_desc_num        = psramInit()?16:DMA_BUFCOUNT;
 #endif
-    m_i2s_config.dma_buf_len          = psramInit()?512:DMA_BUFLEN;
+    m_i2s_config.dma_frame_num          = psramInit()?512:DMA_BUFLEN;
     m_i2s_config.use_apll             = APLL_DISABLE; // must be disabled in V2.0.1-RC1
     m_i2s_config.tx_desc_auto_clear   = true;   // new in V1.0.1
     m_i2s_config.fixed_mclk           = I2S_PIN_NO_CHANGE;
@@ -323,7 +323,7 @@ void Audio::setDefaults() {
     }
     playI2Sremains();
 
-    AUDIO_INFO("buffers freed, free Heap: %u bytes", ESP.getFreeHeap());
+    AUDIO_INFO("buffers freed, free Heap: %lu bytes", ESP.getFreeHeap());
 
     m_f_chunked = false;                                    // Assume not chunked
     m_f_firstmetabyte = false;
@@ -513,7 +513,7 @@ bool Audio::connecttohost(const char* host, const char* user, const char* pwd) {
     if(res){
         uint32_t dt = millis() - t;
         strcpy(m_lastHost, l_host);
-        AUDIO_INFO("%s has been established in %u ms, free Heap: %u bytes",
+        AUDIO_INFO("%s has been established in %lu ms, free Heap: %lu bytes",
                     m_f_ssl?"SSL":"Connection", dt, ESP.getFreeHeap());
         m_f_running = true;
     }
@@ -1292,7 +1292,7 @@ int Audio::read_WAV_Header(uint8_t* data, size_t len) {
         AUDIO_INFO("FormatCode: %u", fc);
         // AUDIO_INFO("Channel: %u", nic);
         // AUDIO_INFO("SampleRate: %u", sr);
-        AUDIO_INFO("DataRate: %u", dr);
+        AUDIO_INFO("DataRate: %lu", dr);
         AUDIO_INFO("DataBlockSize: %u", dbs);
         AUDIO_INFO("BitsPerSample: %u", bps);
 
@@ -1388,7 +1388,7 @@ int Audio::read_FLAC_Header(uint8_t *data, size_t len) {
         m_controlCounter = FLAC_MAGIC;
         if(getDatamode() == AUDIO_LOCALFILE){
             m_contentlength = getFileSize();
-            AUDIO_INFO("Content-Length: %u", m_contentlength);
+            AUDIO_INFO("Content-Length: %lu", m_contentlength);
         }
         return 0;
     }
@@ -1453,7 +1453,7 @@ int Audio::read_FLAC_Header(uint8_t *data, size_t len) {
         vTaskDelay(2);
         uint32_t nextval = bigEndian(data + 13, 3);
         m_flacSampleRate = nextval >> 4;
-        AUDIO_INFO("FLAC sampleRate: %u", m_flacSampleRate);
+        AUDIO_INFO("FLAC sampleRate: %lu", m_flacSampleRate);
         vTaskDelay(2);
         m_flacNumChannels = ((nextval & 0x06) >> 1) + 1;
         AUDIO_INFO("FLAC numChannels: %u", m_flacNumChannels);
@@ -1469,13 +1469,13 @@ int Audio::read_FLAC_Header(uint8_t *data, size_t len) {
         AUDIO_INFO("FLAC bitsPerSample: %u", m_flacBitsPerSample);
         m_flacTotalSamplesInStream = bigEndian(data + 17, 4);
         if(m_flacTotalSamplesInStream){
-            AUDIO_INFO("total samples in stream: %u", m_flacTotalSamplesInStream);
+            AUDIO_INFO("total samples in stream: %lu", m_flacTotalSamplesInStream);
         }
         else{
             AUDIO_INFO("total samples in stream: N/A");
         }
         if(bps != 0 && m_flacTotalSamplesInStream) {
-            AUDIO_INFO("audio file duration: %u seconds", m_flacTotalSamplesInStream / m_flacSampleRate);
+            AUDIO_INFO("audio file duration: %lu seconds", m_flacTotalSamplesInStream / m_flacSampleRate);
         }
         m_controlCounter = FLAC_MBH; // METADATA_BLOCK_HEADER
         retvalue = l + 3;
@@ -1565,7 +1565,7 @@ int Audio::read_ID3_Header(uint8_t *data, size_t len) {
         if(getDatamode() == AUDIO_LOCALFILE){
             ID3version = 0;
             m_contentlength = getFileSize();
-            AUDIO_INFO("Content-Length: %u", m_contentlength);
+            AUDIO_INFO("Content-Length: %lu", m_contentlength);
         }
         m_controlCounter ++;
         APIC_seen = false;
@@ -1941,10 +1941,10 @@ int Audio::read_M4A_Header(uint8_t *data, size_t len) {
             if(streamType!= 5) { log_e("Streamtype is not audio!"); }
 
             uint32_t maxBr = bigEndian(pos + 26, 4); // max bitrate
-            AUDIO_INFO("max bitrate: %i", maxBr);
+            AUDIO_INFO("max bitrate: %li", maxBr);
 
             uint32_t avrBr = bigEndian(pos + 30, 4); // avg bitrate
-            AUDIO_INFO("avr bitrate: %i", avrBr);
+            AUDIO_INFO("avr bitrate: %li", avrBr);
 
             uint16_t ASC   = bigEndian(pos + 39, 2);
 
@@ -1962,7 +1962,7 @@ int Audio::read_M4A_Header(uint8_t *data, size_t len) {
                     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350
             };
             uint8_t sRate = (ASC & 0x0600) >> 7; // next 4 bits Sampling Frequencies
-            AUDIO_INFO("Sampling Frequency: %u",samplingFrequencies[sRate]);
+            AUDIO_INFO("Sampling Frequency: %lu",samplingFrequencies[sRate]);
 
             uint8_t chConfig = (ASC & 0x78) >> 3;  // next 4 bits
             if(chConfig == 0) AUDIO_INFO("Channel Configurations: AOT Specifc Config");
@@ -2048,7 +2048,7 @@ int Audio::read_M4A_Header(uint8_t *data, size_t len) {
         m_audioDataStart = headerSize;
 //        m_contentlength = headerSize + m_audioDataSize; // after this mdat atom there may be other atoms
         if(getDatamode() == AUDIO_LOCALFILE){
-            AUDIO_INFO("Content-Length: %u", m_contentlength);
+            AUDIO_INFO("Content-Length: %lu", m_contentlength);
             if(audio_progress) audio_progress(m_audioDataStart, m_audioDataSize);
         }
         m_controlCounter = M4A_OKAY; // that's all
@@ -2086,7 +2086,7 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         m_controlCounter = OGG_MAGIC;
         if(getDatamode() == AUDIO_LOCALFILE){
             m_contentlength = getFileSize();
-            AUDIO_INFO("Content-Length: %u", m_contentlength);
+            AUDIO_INFO("Content-Length: %lu", m_contentlength);
         }
         return 0;
     }
@@ -2211,7 +2211,7 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         uint32_t nextval = bigEndian(data + i, 3);
         i += 3;
         m_flacSampleRate = nextval >> 4;
-        AUDIO_INFO("FLAC sampleRate: %u", m_flacSampleRate);
+        AUDIO_INFO("FLAC sampleRate: %lu", m_flacSampleRate);
         vTaskDelay(2);
         m_flacNumChannels = ((nextval & 0x06) >> 1) + 1;
         AUDIO_INFO("FLAC numChannels: %u", m_flacNumChannels);
@@ -2235,13 +2235,13 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         m_flacTotalSamplesInStream = bigEndian(data + i, 4);
         i++;
         if(m_flacTotalSamplesInStream) {
-            AUDIO_INFO("total samples in stream: %u", m_flacTotalSamplesInStream);
+            AUDIO_INFO("total samples in stream: %lu", m_flacTotalSamplesInStream);
         }
         else {
             AUDIO_INFO("total samples in stream: N/A");
         }
         if(bps != 0 && m_flacTotalSamplesInStream) {
-            AUDIO_INFO("audio file duration: %u seconds", m_flacTotalSamplesInStream / m_flacSampleRate);
+            AUDIO_INFO("audio file duration: %lu seconds", m_flacTotalSamplesInStream / m_flacSampleRate);
         }
         m_controlCounter = OGG_MAGIC;
         retvalue = pageLen;
@@ -2255,7 +2255,7 @@ int Audio::read_OGG_Header(uint8_t *data, size_t len){
         }
         if(!FLACDecoder_AllocateBuffers()) {m_f_running = false; stopSong(); return -1;}
         InBuff.changeMaxBlockSize(m_frameSizeFLAC);
-        AUDIO_INFO("FLACDecoder has been initialized, free Heap: %u bytes", ESP.getFreeHeap());
+        AUDIO_INFO("FLACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
 
         m_controlCounter = OGG_OKAY; // 100
         eofHeader = true;
@@ -2341,7 +2341,7 @@ void Audio::playI2Sremains() { // returns true if all dma_buffs flushed
     if(getBitsPerSample() > 8) memset(m_outBuff,   0, sizeof(m_outBuff));     //Clear OutputBuffer (signed)
     else                       memset(m_outBuff, 128, sizeof(m_outBuff));     //Clear OutputBuffer (unsigned, PCM 8u)
 
-    m_validSamples = m_i2s_config.dma_buf_len;
+    m_validSamples = m_i2s_config.dma_frame_num;
     while(m_validSamples) {
         playChunk();
     }
@@ -3079,7 +3079,7 @@ void Audio::processLocalFile() {
         playI2Sremains();
 
         if(m_f_loop  && f_stream){  //eof
-            AUDIO_INFO("loop from: %u to: %u", getFilePos(), m_audioDataStart); //TEST loop
+            AUDIO_INFO("loop from: %lu to: %lu", getFilePos(), m_audioDataStart); //TEST loop
             setFilePos(m_audioDataStart);
             if(m_codec == CODEC_FLAC) FLACDecoderReset();
             /*
@@ -3780,7 +3780,7 @@ bool Audio::parseHttpResponseHeader() { // this is the response to a GET / reque
             int32_t br = atoi(c_bitRate); // Found bitrate tag, read the bitrate in Kbit
             br = br * 1000;
             setBitrate(br);
-            sprintf(chbuf, "%d", getBitRate());
+            sprintf(chbuf, "%lu", getBitRate());
             if(audio_bitrate) audio_bitrate(chbuf);
         }
 
@@ -3805,7 +3805,7 @@ bool Audio::parseHttpResponseHeader() { // this is the response to a GET / reque
             int32_t i_cl = atoi(c_cl);
             m_contentlength = i_cl;
             m_streamType = ST_WEBFILE; // Stream comes from a fileserver
-            if(m_f_Log) AUDIO_INFO("content-length: %i", m_contentlength);
+            if(m_f_Log) AUDIO_INFO("content-length: %li", m_contentlength);
         }
 
         else if(startsWith(rhl, "icy-description:")) {
@@ -3870,20 +3870,20 @@ bool Audio:: initializeDecoder(){
     switch(m_codec){
         case CODEC_MP3:
             if(!MP3Decoder_AllocateBuffers()) goto exit;
-            AUDIO_INFO("MP3Decoder has been initialized, free Heap: %u bytes", ESP.getFreeHeap());
+            AUDIO_INFO("MP3Decoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
             InBuff.changeMaxBlockSize(m_frameSizeMP3);
             break;
         case CODEC_AAC:
             if(!AACDecoder_IsInit()){
                 if(!AACDecoder_AllocateBuffers()) goto exit;
-                AUDIO_INFO("AACDecoder has been initialized, free Heap: %u bytes", ESP.getFreeHeap());
+                AUDIO_INFO("AACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
                 InBuff.changeMaxBlockSize(m_frameSizeAAC);
             }
             break;
         case CODEC_M4A:
             if(!AACDecoder_IsInit()){
                 if(!AACDecoder_AllocateBuffers()) goto exit;
-                AUDIO_INFO("AACDecoder has been initialized, free Heap: %u bytes", ESP.getFreeHeap());
+                AUDIO_INFO("AACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
                 InBuff.changeMaxBlockSize(m_frameSizeAAC);
             }
             break;
@@ -3894,7 +3894,7 @@ bool Audio:: initializeDecoder(){
             }
             if(!FLACDecoder_AllocateBuffers()) goto exit;
             InBuff.changeMaxBlockSize(m_frameSizeFLAC);
-            AUDIO_INFO("FLACDecoder has been initialized, free Heap: %u bytes", ESP.getFreeHeap());
+            AUDIO_INFO("FLACDecoder has been initialized, free Heap: %lu bytes", ESP.getFreeHeap());
             break;
         case CODEC_WAV:
             InBuff.changeMaxBlockSize(m_frameSizeWav);
@@ -3912,7 +3912,7 @@ bool Audio:: initializeDecoder(){
     return true;
 
     exit:
-        AUDIO_ERROR("Not enough free memory to initialize the decoder: %u bytes free", ESP.getFreeHeap());
+        AUDIO_ERROR("Not enough free memory to initialize the decoder: %lu bytes free", ESP.getFreeHeap());
         stopSong();
         return false;
 }
@@ -4148,9 +4148,9 @@ void Audio::showCodecParams(){
     // print Codec Parameter (mp3, aac) in audio_info()
 
     AUDIO_INFO("Channels: %i", getChannels());
-    AUDIO_INFO("SampleRate: %i", getSampleRate());
+    AUDIO_INFO("SampleRate: %li", getSampleRate());
     AUDIO_INFO("BitsPerSample: %i", getBitsPerSample());
-    if(getBitRate()) {AUDIO_INFO("BitRate: %i", getBitRate());}
+    if(getBitRate()) {AUDIO_INFO("BitRate: %li", getBitRate());}
     else             {AUDIO_INFO("BitRate: N/A");}
 
     if(m_codec == CODEC_AAC || m_codec == CODEC_M4A){
@@ -4216,7 +4216,7 @@ int Audio::findNextSync(uint8_t* data, size_t len){
      }
      if (nextSync == 0){
          if(audio_info && swnf>0){
-             sprintf(chbuf, "syncword not found %i times", swnf);
+             sprintf(chbuf, "syncword not found %li times", swnf);
              audio_info(chbuf);
              swnf = 0;
          }
