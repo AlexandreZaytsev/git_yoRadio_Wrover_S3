@@ -7,10 +7,11 @@
 
 #include "yoEncoder.h"
 
-//было
-//void IRAM_ATTR yoEncoder::readEncoder_ISR()
+// Было:
+//void IRAM_ATTR yoEncoder::readEncoder_ISR() {
 // Стало:
-void yoEncoder::readEncoder_ISR() {
+void yoEncoder::readEncoder_ISR() 
+
 {
 
 	unsigned long now = millis();
