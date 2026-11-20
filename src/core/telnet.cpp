@@ -80,7 +80,7 @@ void Telnet::loop() {
     return;
   }
   uint8_t i;
-  if(config.store.telnet)
+  if(config.store.telnet){
     if (WiFi.status() == WL_CONNECTED) {
       if (server.hasClient()) {
         for (i = 0; i < MAX_TLN_CLIENTS; i++) {
@@ -124,6 +124,7 @@ void Telnet::loop() {
       }
       delay(1000);
     }
+  } 
   handleSerial();
 }
 

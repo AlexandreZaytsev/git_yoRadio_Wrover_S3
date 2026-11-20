@@ -296,10 +296,16 @@ const uint16_t baseY = (uint16_t)(dsp.height() * 0.25); // старт чуть �
   // Данные — с лёгким отступом слева, ровной колонкой
   uint16_t y = topY + titleH + 8;
   _infoSsid  = new TextWidget({4, y,            lineSize, WA_LEFT}, 30, false, config.theme.title1, config.theme.background);
+  //было
+  /*
   _infoIp    = new TextWidget({4, y + lineH,    lineSize, WA_LEFT}, 20, false, config.theme.clock,  config.theme.background);
   _infoRssi  = new TextWidget({4, y + 2*lineH,  lineSize, WA_LEFT}, 10, false, config.theme.rssi,   config.theme.background);
   _infoHeap  = new TextWidget({4, y + 3*lineH,  lineSize, WA_LEFT}, 12, false, config.theme.heap,   config.theme.background);
-
+*/
+//стало
+  _infoIp    = new TextWidget({4, (uint16_t)(y + lineH),    lineSize, WA_LEFT}, 20, false, config.theme.clock,  config.theme.background);
+  _infoRssi  = new TextWidget({4, (uint16_t)(y + 2*lineH),  lineSize, WA_LEFT}, 10, false, config.theme.rssi,   config.theme.background);
+  _infoHeap  = new TextWidget({4, (uint16_t)(y + 3*lineH),  lineSize, WA_LEFT}, 12, false, config.theme.heap,   config.theme.background);
 
 
   pages[PG_INFO]->addWidget(_infoTitle);

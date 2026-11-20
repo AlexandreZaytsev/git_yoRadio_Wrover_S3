@@ -80,7 +80,14 @@ void setup() {
 #elif defined(ENV_ESP32_S3_DEVKITC_1_ALT) || defined(ENV_ESP32_S3_KIT)
   /* Гасим WS2812 на GPIO48: нулевой кадр + удержание линии в LOW,
      чтобы светодиод не защёлкивал наводки с «висящего» пина */
-  neopixelWrite(48, 0, 0, 0);
+
+// Было: 
+//        neopixelWrite(48, 0, 0, 0);
+// Стало: 
+  rgbLedWrite(48, 0, 0, 0);
+
+
+
   pinMode(48, OUTPUT);
   digitalWrite(48, LOW);
 #endif

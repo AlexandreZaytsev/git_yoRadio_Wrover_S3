@@ -203,9 +203,9 @@ void NetServer::processQueue(){
             if (BRIGHTNESS_PIN != 255 || nxtn || dbgact)        APPEND_GROUP("group_brightness");
             if (DSP_CAN_FLIPPED || dbgact)                      APPEND_GROUP("group_tft");
             if (TS_MODEL != TS_MODEL_UNDEFINED || dbgact)       APPEND_GROUP("group_touch");
-            if (DSP_MODEL == DSP_NOKIA5110)                     APPEND_GROUP("group_nokia");
+            if (DSP_MODEL == DSP_NOKIA5110)                     {APPEND_GROUP("group_nokia");}
                                                                 APPEND_GROUP("group_timezone");
-            if (SHOW_WEATHER || dbgact)                         APPEND_GROUP("group_weather");
+            if (SHOW_WEATHER || dbgact)                         {APPEND_GROUP("group_weather");}
                                                                 APPEND_GROUP("group_controls");
             if (ENC_BTNL != 255 || ENC2_BTNL != 255 || dbgact)  APPEND_GROUP("group_encoder");
             if (IR_PIN != 255 || dbgact)                        APPEND_GROUP("group_ir");

@@ -88,7 +88,11 @@ class DspCore: public yoDisplay {
       }
       void setTextSize(uint8_t s);
     #endif
-    #if ADAFRUIT_CLIPPING
+    // Было:  
+    // #if ADAFRUIT_CLIPPING
+    // Стало:
+     #if defined(ADAFRUIT_CLIPPING) && ADAFRUIT_CLIPPING
+
       inline void writePixel(int16_t x, int16_t y, uint16_t color) {
         if(_clipping){
           if ((x < _cliparea.left) || (x > _cliparea.left+_cliparea.width) || (y < _cliparea.top) || (y > _cliparea.top + _cliparea.height)) return;
