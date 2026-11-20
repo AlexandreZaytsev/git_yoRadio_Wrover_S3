@@ -2,7 +2,18 @@
 #define common_gfx_h
 #include "../widgets/widgetsconfig.h" // displayXXXDDDDconf.h
 #include "utf8Rus.h"
-#define ADAFRUIT_CLIPPING !defined(DSP_LCD) && DSP_MODEL!=DSP_ILI9225
+
+// Было:
+//#define ADAFRUIT_CLIPPING !defined(DSP_LCD) && DSP_MODEL!=DSP_ILI9225
+
+// Стало:
+#ifndef DSP_LCD
+  #define ADAFRUIT_CLIPPING DSP_MODEL!=DSP_ILI9225
+#else
+  #define ADAFRUIT_CLIPPING 0
+#endif
+
+
 
 typedef struct clipArea {
   uint16_t left; 
@@ -89,9 +100,9 @@ class DspCore: public yoDisplay {
       void setTextSize(uint8_t s);
     #endif
     // Было:  
-    // #if ADAFRUIT_CLIPPING
+     #if ADAFRUIT_CLIPPING
     // Стало:
-     #if defined(ADAFRUIT_CLIPPING) && ADAFRUIT_CLIPPING
+   //  #if defined(ADAFRUIT_CLIPPING) && ADAFRUIT_CLIPPING
 
       inline void writePixel(int16_t x, int16_t y, uint16_t color) {
         if(_clipping){
