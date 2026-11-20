@@ -88,7 +88,11 @@ void Telnet::loop() {
             if (clients[i]) {
               clients[i].stop();
             }
-            clients[i] = server.available();
+            //Было (первое, в блоке hasClient):
+            //clients[i] = server.available();
+            // Стало:
+            clients[i] = server.accept();
+
             if (!clients[i]) Serial.println("available broken");
             on_connect(config.ipToStr(clients[i].remoteIP()), i);
             clients[i].setNoDelay(true);
@@ -97,7 +101,12 @@ void Telnet::loop() {
           }
         }
         if (i >= MAX_TLN_CLIENTS) {
-          server.available().stop();
+          
+          // Было (второе, в блоке "нет свободных клиентов"):  
+          //server.available().stop();
+            // Стало:
+            server.accept().stop();
+
         }
       }
       for (i = 0; i < MAX_TLN_CLIENTS; i++) {
