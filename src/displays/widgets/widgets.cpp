@@ -673,7 +673,8 @@ void ClockWidget::_getTimeBounds() {
   }
 #endif
 void ClockWidget::_printClock(bool force){
-  if(force) Serial.printf("[CLOCK] full redraw %02d:%02d\n", network.timeinfo.tm_min, network.timeinfo.tm_sec);  
+  //if(force) Serial.printf("[CLOCK] full redraw %02d:%02d\n", network.timeinfo.tm_min, network.timeinfo.tm_sec);  
+  
   auto& gfx = getRealDsp();
   gfx.setTextSize(Clock_GFXfontPtr==nullptr?TIME_SIZE:1);
   gfx.setFont(Clock_GFXfontPtr);

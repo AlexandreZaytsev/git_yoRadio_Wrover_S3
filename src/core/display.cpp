@@ -107,60 +107,17 @@ void Display::init() {
 #if LIGHT_SENSOR!=255
   analogSetAttenuation(ADC_0db);
 #endif
-
-/*
-  _bootStep = 0;
-  dsp.initDisplay();
-  dsp.clearDsp();          //стираем остаточный кадр из RAM (reset дисплея стоить на пине reset и настоящего сброса после прошивки не происходит и на экран выводиться последний кадр из памяти дисплея)
-
+ _bootStep = 0;
+  dsp.initDisplay();          // без DISPON — панель остаётся «off»
+  dsp.enableDisplay(false);   // 0x28 — гасим на всякий случай
+  dsp.clearDsp();             // чистим GRAM в темноте
+  _pager = new Pager();
+  _bootScreen();              // бут-скрин на погашенной панели
+  dsp.enableDisplay(true);    // единственное включение
   displayQueue=NULL;
   displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
   while(displayQueue==NULL){;}
   _createDspTask();
-  while(!_bootStep==0) { delay(10); }
-  //_pager.begin();
-  //_bootScreen();
-  _pager = new Pager();
-  _footer = new Page();
-  _plwidget = new PlayListWidget();
-  _nums = new NumWidget();
-  _clock = new ClockWidget();
-  _meta = new ScrollWidget();
-  _title1 = new ScrollWidget();
-  _plcurrent = new ScrollWidget();
-*/
- _bootStep = 0;
-  dsp.initDisplay();     // теперь без DISPON — панель остаётся «off»
-//  dsp.clearDsp();          // стираем остаточный кадр — RAM держит его, т.к. TFT_RST на EN
-
-/*
- dsp.enableDisplay(false);   // 0x28 — панель гасим сразу после инициализации
- dsp.clearDsp();             // стираем старый кадр при выключенном экране
-   _pager = new Pager();    // пейджер создаём ДО старта DspTask — закрываем гонку
-  _bootScreen();           // рисуем бут-экран синхронно, _bootStep станет 1
- dsp.enableDisplay(true);    // 0x29 — включаем уже чистый
-*/
-/*
-dsp.enableDisplay(false);
-  Serial.println("##PHASE#1 panel off, before clear");
-  delay(2000);
-  dsp.clearDsp();
-  Serial.println("##PHASE#2 cleared, panel still off");  
-  delay(2000);
-  dsp.enableDisplay(true);
-  Serial.println("##PHASE#4 panel on, boot visible");
-  delay(2000);
-*/
- dsp.enableDisplay(false);   // страховка: 0x28 на всякий случай
-  dsp.clearDsp();             // чистим GRAM
-  _pager = new Pager();
-  _bootScreen();              // рисуем бут-скрин
-  dsp.enableDisplay(true);    // единственное включение — здесь
-  
-  displayQueue=NULL;
-  displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
-  while(displayQueue==NULL){;}
-  _createDspTask();        // теперь задача стартует на готовом пейджере
   _footer = new Page();
   _plwidget = new PlayListWidget();
   _nums = new NumWidget();
