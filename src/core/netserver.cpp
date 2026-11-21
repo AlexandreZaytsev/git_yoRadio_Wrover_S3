@@ -133,7 +133,13 @@ void NetServer::chunkedHtmlPage(const String& contentType, AsyncWebServerRequest
   display.lock();
   #endif
   response = request->beginChunkedResponse(contentType, chunkedHtmlPageCallback);
-  response->addHeader("Cache-Control","max-age=31536000");
+  
+  //алиса
+  //  response->addHeader("Cache-Control","max-age=31536000");
+  // списки, которые правят из веб-морды, — без кеша; остальное можно в длинный
+    bool nocache = (strcmp(path, SSIDS_PATH) == 0 || strcmp(path, TMP_PATH) == 0 || strcmp(path, PLAYLIST_PATH) == 0);
+    response->addHeader("Cache-Control", nocache ? "no-cache" : "max-age=31536000");
+
   request->send(response);
 }
 

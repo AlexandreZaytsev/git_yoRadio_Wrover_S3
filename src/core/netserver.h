@@ -39,7 +39,7 @@ input[type=text],input[type=password]{width:170px;background:#272727;color:#e3d2
 <div class="flex">
 <div><label for="ssid">ssid:</label><input type="text" id="ssid" name="ssid" value="" maxlength="30" autocomplete="off"></div>
 <div><label for="pass">pass:</label><input type="password" id="pass" name="pass" value="" maxlength="40" autocomplete="off"></div>
-<div><label for="label">label:</label><input type="text" id="label" name="ssid" value="" maxlength="15" autocomplete="off" placeholder="Короткое имя"></div>
+<div><label for="label">label:</label><input type="text" id="label" name="label" value="" maxlength="15" autocomplete="off" placeholder="Короткое имя"></div>
 </div>
 <p><input type="submit" name="submit" value="Save Credentials"></p>
 </form>
