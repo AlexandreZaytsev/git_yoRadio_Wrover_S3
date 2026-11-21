@@ -84,12 +84,11 @@ void setup() {
 // Было: 
 //        neopixelWrite(48, 0, 0, 0);
 // Стало: 
-  rgbLedWrite(48, 0, 0, 0);
-
-
-
+  rgbLedWrite(48, 0, 0, 0);     //гасим
   pinMode(48, OUTPUT);
   digitalWrite(48, LOW);
+//  Serial.println("[RGB] off GPIO48");
+//  rgbLedWrite(48, 0, 255, 0);   // ждём зелёный
 #endif
 
   ampMute.init(AMP_MUTE_GPIO);     // ДО ветвления, до раннего return в AP-режиме

@@ -128,9 +128,9 @@ DISPOFF = белый, не чёрный на вашей панели — зна�
    На платах S3 (WS2812 обычно на GPIO48) ёРадио по умолчанию
    использует встроенный LED. USE_BUILTIN_LED false + LED_BUILTIN_S3 255
    даёт REAL_LEDBUILTIN == 255 — пин не инициализируется вовсе. */
-//#define USE_BUILTIN_LED       false
-//#define LED_BUILTIN_S3        255
-//#define LED_BUILTIN           255
+#define USE_BUILTIN_LED       false //для ядра 3
+#define LED_BUILTIN_S3        255   //для ядра 3
+//#define LED_BUILTIN           255    
 //#define LED_INVERT            false
 
 
