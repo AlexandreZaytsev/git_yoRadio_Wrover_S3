@@ -187,6 +187,7 @@ Reengineering base release yoradio v0.9.693
    - [x] /data/www/script.js.gz изменена функция function handleWiFiData(fileData)
    - [x] /data/www/script.js.gz изменена функция function submitWiFi()
    - [x] /data/www/options.html.gz ljдобавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
+   - [x] /src/core/netserver.cpp изменена функция void NetServer::chunkedHtmlPage кеш на имена wifi сетей и плейлист отключаем (имена wifi при редактировании теперь сохраняются в файле wifi.csv playlist.csv на флеш памяти)  
 - отображение дескриптора wifi сети вместо имени
    - [x] /src/core/config.h расширен class Config {
    - [x] /src/core/config.cpp добавлена константа const char* Config::labelBySsid(const char* ssid){
@@ -203,6 +204,6 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/display.cpp Page *pages[] расширяем на 5ть страниц 
    - [x] /src/core/display.cpp Page *pages[] меняем _buildPager()
    - [x] /src/core/display.cpp Page *pages[] меняем _swichMode()
-
+- переход на версию ядра 3 (espressif32@~8.0.0)
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом
