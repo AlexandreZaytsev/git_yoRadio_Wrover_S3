@@ -50,7 +50,8 @@ Adafruit_ST7735::Adafruit_ST7735(SPIClass *spiClass, int16_t cs, int16_t dc,
 // clang-format off
 static const uint8_t PROGMEM
   Bcmd[] = {                        // Init commands for 7735B screens
-    18,                             // 18 commands in list:
+    //18,                             // 18 commands in list:
+    17,
     ST77XX_SWRESET,   ST_CMD_DELAY, //  1: Software reset, no args, w/delay
       50,                           //     50 ms delay
     ST77XX_SLPOUT,    ST_CMD_DELAY, //  2: Out of sleep mode, no args, w/delay
@@ -105,8 +106,9 @@ static const uint8_t PROGMEM
       0x00, 0x81,                   //     XEND = 160
     ST77XX_NORON,     ST_CMD_DELAY, // 17: Normal display on, no args, w/delay
       10,                           //     10 ms delay
-    ST77XX_DISPON,    ST_CMD_DELAY, // 18: Main screen turn on, no args, delay
-      255 },                        //     255 = max (500 ms) delay
+//    ST77XX_DISPON,    ST_CMD_DELAY, // 18: Main screen turn on, no args, delay
+   //   255 
+    },                        //     255 = max (500 ms) delay
 
   Rcmd1[] = {                       // 7735R init, part 1 (red or green tab)
     15,                             // 15 commands in list:
@@ -192,7 +194,8 @@ static const uint8_t PROGMEM
       0x00, 0x9F },                 //     XEND = 159
 
   Rcmd3[] = {                       // 7735R init, part 3 (red or green tab)
-    4,                              //  4 commands in list:
+   // 4,                              //  4 commands in list:
+    3,
     ST7735_GMCTRP1, 16      ,       //  1: Gamma Adjustments (pos. polarity), 16 args + delay:
       0x02, 0x1c, 0x07, 0x12,       //     (Not entirely necessary, but provides
       0x37, 0x32, 0x29, 0x2d,       //      accurate colors)
@@ -205,8 +208,9 @@ static const uint8_t PROGMEM
       0x00, 0x00, 0x02, 0x10,
     ST77XX_NORON,     ST_CMD_DELAY, //  3: Normal display on, no args, w/delay
       10,                           //     10 ms delay
-    ST77XX_DISPON,    ST_CMD_DELAY, //  4: Main screen turn on, no args w/delay
-      100 };                        //     100 ms delay
+//    ST77XX_DISPON,    ST_CMD_DELAY, //  4: Main screen turn on, no args w/delay
+    //  100 
+    };                        //     100 ms delay
 
 // clang-format on
 
