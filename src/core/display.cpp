@@ -107,7 +107,8 @@ void Display::init() {
 #if LIGHT_SENSOR!=255
   analogSetAttenuation(ADC_0db);
 #endif
- _bootStep = 0;
+  #if DSP_MODEL==DSP_ST7735
+  _bootStep = 0;
   dsp.initDisplay();          // без DISPON — панель остаётся «off»
   dsp.enableDisplay(false);   // 0x28 — гасим на всякий случай
   dsp.clearDsp();             // чистим GRAM в темноте
@@ -125,7 +126,52 @@ void Display::init() {
   _meta = new ScrollWidget();
   _title1 = new ScrollWidget();
   _plcurrent = new ScrollWidget();
+  Serial.println("done");  
+ #else
+  // ILI9341 и прочие: та же логика напрямую командами
+ _bootStep = 0;
+  dsp.initDisplay();
+  displayQueue=NULL;
+  displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
+  while(displayQueue==NULL){;}
+  _createDspTask();
+  while(!_bootStep==0) { delay(10); }
+  //_pager.begin();
+  //_bootScreen();
+  _pager = new Pager();
+  _footer = new Page();
+  _plwidget = new PlayListWidget();
+  _nums = new NumWidget();
+  _clock = new ClockWidget();
+  _meta = new ScrollWidget();
+  _title1 = new ScrollWidget();
+  _plcurrent = new ScrollWidget();
   Serial.println("done");
+
+  /*
+    _bootStep = 0;
+  dsp.initDisplay();          // без DISPON — панель остаётся «off»
+  dsp.writeCommand(ILI9341_DISPOFF);
+  dsp.clearDsp();             // чистим GRAM в темноте
+  _pager = new Pager();
+  _bootScreen();              // бут-скрин на погашенной панели
+  dsp.writeCommand(ILI9341_DISPON);
+  displayQueue=NULL;
+  displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
+  while(displayQueue==NULL){;}
+  _createDspTask();
+  _footer = new Page();
+  _plwidget = new PlayListWidget();
+  _nums = new NumWidget();
+  _clock = new ClockWidget();
+  _meta = new ScrollWidget();
+  _title1 = new ScrollWidget();
+  _plcurrent = new ScrollWidget();
+  Serial.println("done");  
+*/
+  #endif
+
+  
 }
 
 uint16_t Display::width(){ return dsp.width(); }
