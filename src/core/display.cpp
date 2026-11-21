@@ -130,15 +130,32 @@ void Display::init() {
   _plcurrent = new ScrollWidget();
 */
  _bootStep = 0;
-  dsp.initDisplay();
+  dsp.initDisplay();     // теперь без DISPON — панель остаётся «off»
 //  dsp.clearDsp();          // стираем остаточный кадр — RAM держит его, т.к. TFT_RST на EN
 
+/*
  dsp.enableDisplay(false);   // 0x28 — панель гасим сразу после инициализации
  dsp.clearDsp();             // стираем старый кадр при выключенном экране
    _pager = new Pager();    // пейджер создаём ДО старта DspTask — закрываем гонку
   _bootScreen();           // рисуем бут-экран синхронно, _bootStep станет 1
  dsp.enableDisplay(true);    // 0x29 — включаем уже чистый
-
+*/
+/*
+dsp.enableDisplay(false);
+  Serial.println("##PHASE#1 panel off, before clear");
+  delay(2000);
+  dsp.clearDsp();
+  Serial.println("##PHASE#2 cleared, panel still off");  
+  delay(2000);
+  dsp.enableDisplay(true);
+  Serial.println("##PHASE#4 panel on, boot visible");
+  delay(2000);
+*/
+ dsp.enableDisplay(false);   // страховка: 0x28 на всякий случай
+  dsp.clearDsp();             // чистим GRAM
+  _pager = new Pager();
+  _bootScreen();              // рисуем бут-скрин
+  dsp.enableDisplay(true);    // единственное включение — здесь
   
   displayQueue=NULL;
   displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
