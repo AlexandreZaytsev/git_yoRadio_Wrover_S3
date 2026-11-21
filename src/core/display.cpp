@@ -109,6 +109,8 @@ void Display::init() {
 #endif
   _bootStep = 0;
   dsp.initDisplay();
+  dsp.clearDsp();          //стираем остаточный кадр из RAM (reset дисплея стоить на пине reset и настоящего сброса после прошивки не происходит и на экран выводиться последний кадр из памяти дисплея)
+
   displayQueue=NULL;
   displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
   while(displayQueue==NULL){;}
