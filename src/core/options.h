@@ -96,6 +96,7 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 #endif
 #ifndef USE_FBUFFER
   #define USE_FBUFFER     true
+//  #define USE_FBUFFER false
 #endif
 #ifndef FULL_SCR_CLOCK
   #define FULL_SCR_CLOCK     true

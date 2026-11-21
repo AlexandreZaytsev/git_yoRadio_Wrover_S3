@@ -116,4 +116,10 @@
 //#define LED_BUILTIN           255
 //#define LED_INVERT            false
 
+
+#define USE_FBUFFER false
+#define FULL_SCR_CLOCK false
+//#define CORE_STACK_SIZE  1024*16   // тест: 16 КБ вместо 4
+//#define DEF_SPI_FREQ    20000000UL
+
 #endif
