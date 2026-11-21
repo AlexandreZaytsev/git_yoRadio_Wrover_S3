@@ -57,6 +57,7 @@ DISPOFF = белый, не чёрный на вашей панели — зна�
 #define I2S_DOUT            47
 #define I2S_BCLK            38
 #define I2S_LRC             39
+#define I2S_DIN  17   //полный дуплекс  вход потока от Wrover (BT), резерв — GPIO18
 
 /* ---------- VS1053 — отключён (255) ---------- */
 #define VS1053_CS           255
