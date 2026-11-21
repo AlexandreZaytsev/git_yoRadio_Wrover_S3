@@ -107,6 +107,8 @@ void Display::init() {
 #if LIGHT_SENSOR!=255
   analogSetAttenuation(ADC_0db);
 #endif
+
+/*
   _bootStep = 0;
   dsp.initDisplay();
   dsp.clearDsp();          //стираем остаточный кадр из RAM (reset дисплея стоить на пине reset и настоящего сброса после прошивки не происходит и на экран выводиться последний кадр из памяти дисплея)
@@ -119,6 +121,29 @@ void Display::init() {
   //_pager.begin();
   //_bootScreen();
   _pager = new Pager();
+  _footer = new Page();
+  _plwidget = new PlayListWidget();
+  _nums = new NumWidget();
+  _clock = new ClockWidget();
+  _meta = new ScrollWidget();
+  _title1 = new ScrollWidget();
+  _plcurrent = new ScrollWidget();
+*/
+ _bootStep = 0;
+  dsp.initDisplay();
+//  dsp.clearDsp();          // стираем остаточный кадр — RAM держит его, т.к. TFT_RST на EN
+
+ dsp.enableDisplay(false);   // 0x28 — панель гасим сразу после инициализации
+ dsp.clearDsp();             // стираем старый кадр при выключенном экране
+   _pager = new Pager();    // пейджер создаём ДО старта DspTask — закрываем гонку
+  _bootScreen();           // рисуем бут-экран синхронно, _bootStep станет 1
+ dsp.enableDisplay(true);    // 0x29 — включаем уже чистый
+
+  
+  displayQueue=NULL;
+  displayQueue = xQueueCreate( 5, sizeof( requestParams_t ) );
+  while(displayQueue==NULL){;}
+  _createDspTask();        // теперь задача стартует на готовом пейджере
   _footer = new Page();
   _plwidget = new PlayListWidget();
   _nums = new NumWidget();
