@@ -209,34 +209,9 @@ void Player::loop() {
       }
       #ifdef USE_SD
       case PR_CHECKSD: {
-    /* 
-        if(config.getMode()==PM_SDCARD){
-          if(!sdman.cardPresent()){
-            sdman.stop();
-            audioroute::onSourceLost();   // источник умер — маршрут в конфиг откатываем
-            config.changeMode(PM_WEB);
-          }
-        }
-        break;
-*/
-
-/*
-        if(config.getMode()==PM_SDCARD){
-          if(!sdman.cardPresent()){
-            Serial.println("[SDM] card lost -> откат на RADIO");
-            sdman.stop();
-            audioroute::onSourceLost();
-            config.changeMode(PM_WEB);
-            config.initPlaylistMode();
-            netserver.requestOnChange(MODE, 0);
-
-            // PR_PLAY не нужен: changeMode сам отправит PR_PLAY,
-            // т.к. плеер ещё числится запущенным (pir == true)
-//            player.sendCommand({PR_PLAY, config.lastStation()});
-          }
-        }
-*/
-
+// Карта исчезла на ходу: откатываем маршрут на RADIO.
+        // Меняем режим только при поднятой сети — иначе changeMode(PM_WEB)
+        // при SDREADY упрётся в ESP.restart() из config.cpp.
         if(config.getMode()==PM_SDCARD && network.status==CONNECTED){
           if(!sdman.cardPresent()){
             Serial.println("[SDM] card lost -> откат на RADIO");

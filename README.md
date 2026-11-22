@@ -1,6 +1,3 @@
-
-
-
 # git_yoRadio_Wrover_S3
 > Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693  
 
@@ -35,14 +32,14 @@ platformio.ini
 ```
 ;default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
-default_envs = esp32-s3-devkitc-1-alt`
+default_envs = esp32-s3-devkitc-1-alt
 ```
 config/myoptions_s3_alt.h
 ```
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49`
+#define SDC_CS      49
 ```
 ![3d](/hardware/kompas_3d/asm.png)    
 ![v1](/hardware/release_v2.png)    
@@ -60,14 +57,14 @@ platformio.ini
 ```
 ;default_envs = esp32-wrover-kit
 default_envs = esp32-s3-kit
-;default_envs = esp32-s3-devkitc-1-alt`
+;default_envs = esp32-s3-devkitc-1-alt
 ```
 config/myoptions_s3.h
 ```
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49`
+#define SDC_CS      49
 ```    
 
 xls pinout (/hardware/youradio Wrover_S3-pinout.xlsx)    
@@ -186,7 +183,7 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/network.cpp изменена функция void MyNetwork::WiFiLostConnection(WiFiEvent_t event, WiFiEventInfo_t info)
    - [x] /data/www/script.js.gz изменена функция function handleWiFiData(fileData)
    - [x] /data/www/script.js.gz изменена функция function submitWiFi()
-   - [x] /data/www/options.html.gz ljдобавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
+   - [x] /data/www/options.html.gz добавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
    - [x] /src/core/netserver.cpp изменена функция void NetServer::chunkedHtmlPage кеш на имена wifi сетей и плейлист отключаем (имена wifi при редактировании теперь сохраняются в файле wifi.csv playlist.csv на флеш памяти)  
 - отображение дескриптора wifi сети вместо имени
    - [x] /src/core/config.h расширен class Config {
@@ -195,7 +192,6 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/display.cpp исправлена обработка case BOOTSTRING
 - показать инфо экран в браузере команда http://<ip-радио>/?dspinfo=1  
    - [x] /src/core/commandhandler.cpp в конце exec
-   - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
    - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
    - [x] /src/core/display.cpp дополнена функция void Display::loop() {
 - рисуем свою страницу инфо
@@ -209,6 +205,26 @@ Reengineering base release yoradio v0.9.693
 ## История изменений
 <!-- ======= даты «XX» и «(ранняя)» уточняются по git log --date=short;
      в каждую запись «Что» можно дописать «Коммит: a1b2c3d» ======= -->
+### 2026-11-22 — Фикс бут-петли в SD-режиме + чистый откат PR_CHECKSD
+**Что:** бут с сохранённым SD падал в петлю рестартов (RTC_SW_CPU_RST через
+~100 мс после SD indexing, детерминированно). Причина: `audioroute::begin()`
+при расхождении `play_mode` с маршрутом звал `changeMode(PM_WEB)`, а штатный
+`changeMode` при `network.status==SDREADY` делает `ESP.restart()` — Wi-Fi ещё
+не был поднят (поднимается фоновой задачей `searchWiFi`). Теперь режим
+выравнивается только при `CONNECTED`, иначе источник подгоняется под
+фактический `play_mode` с сохранением в конфиг. Заодно из `PR_CHECKSD` убран
+дублирующий `PR_PLAY` — `changeMode` сам отправляет его (плеер ещё числится
+запущенным, `pir == true`), было двойное «Connect to new host» при откате.
+Откат дополнен проверкой `network.status==CONNECTED`
+(+ `#include "network.h"` в player.cpp).
+**Изменённые файлы:**
+- src/core/audioroute.cpp — ветка выравнивания в begin(), инклюд network.h
+- src/core/player.cpp — PR_CHECKSD: чистый откат, проверка сети, чистка мёртвого кода
+**Проверено:**
+- бут с сохранённым SD — `Ready in SD Mode!`, играет без рестарта, Wi-Fi в фоне;
+- выдёргивание карты на ходу — откат за ~0.5 сек, ОДИН коннект, радио играет;
+- бут в радио-режиме — штатный, без регрессий.
+
 ### Этап 2 — Пин-обмен: DIN ↔ IR (СДЕЛАНО, подтверждено тестами)
 **Что:** I2S DIN перенесён с GPIO17 на GPIO8, IR-приёмник — с GPIO8 на GPIO18.
 Резерв DIN — GPIO17 (освободился). GPIO45 рассмотрен и отклонён:
@@ -233,11 +249,45 @@ tests/01_i2s_duplex/duplex_tone/src/main.cpp
 - `src/main.cpp` — `audioroute::begin()` после `config.initPlaylistMode()`, до smartstart: маршрут восстанавливается из конфига, недоступный источник откатывается
 - TODO(3) — хук сохранён (реализуется на dual core), TODO(5) — валидация BT-комбинаций (dual core)
 
+### Поведение при старте (важно — это отклонение от штатной логики yoRadio)
+- сеть поднимается в фоне: при сохранённом источнике SD `network.begin()`
+  ставит статус `SDREADY` и запускает Wi-Fi задачей `searchWiFi` на core 0;
+- выравнивание режима плеера с маршрутом выполняется ТОЛЬКО при
+  `network.status == CONNECTED`. При `SDREADY` источник подгоняется под
+  фактический режим (`play_mode`), `changeMode()` не вызывается.
+  Причина: штатный `config.cpp::changeMode()` при переходе на PM_WEB
+  в состоянии SDREADY делает `ESP.restart()` («смена режима без сети →
+  рестарт») — вызов из бута давал детерминированную петлю перезагрузок
+  (RTC_SW_CPU_RST после SD indexing, 3 из 3 бутов);
+- запуск воспроизведения из конфига остаётся за smartstart.
+
+### Откат при потере SD (PR_CHECKSD)
+Периодическая проверка карты в player.cpp. При PM_SDCARD и
+`!sdman.cardPresent()` и `network.status == CONNECTED`:
+1. `sdman.stop()` — останов декодера;
+2. `audioroute::onSourceLost()` — маршрут в конфиге откатывается на RADIO;
+3. `config.changeMode(PM_WEB)` — он САМ отправит PR_PLAY (плеер ещё
+   числится запущенным, `pir == true`); отдельный PR_PLAY не нужен —
+   иначе двойное соединение с хостом;
+4. `netserver.requestOnChange(MODE, 0)` — уведомление вебморды.
+
+Проверка сети перед откатом обязательна: без неё откат в первые секунды
+после бута (пока searchWiFi не поднял Wi-Fi) снова упирается в рестарт
+из config.cpp. При отсутствии сети откат просто перенесётся на следующий
+тик (2 сек).
+
+### Известные ограничения
+- BT-источник и BT_A2DP-потребитель — этап dual core
+  (`srcAllowed`/`sinkAllowed` всегда false);
+- `Player::initHeaders` — чтение тегов ID3 до старта не реализовано
+  (заглушка `|| true`).
+
 Тесты:
 - бут с дефолтным маршрутом (RADIO) — поведение не изменилось
-- выдёргивание карты на ходу в PM_SDCARD — `PR_CHECKSD` откатывает на радио, конфиг перезаписывается
-
-
+- выдёргивание карты на ходу в PM_SDCARD — `PR_CHECKSD` откатывает на радио,
+  конфиг перезаписывается, ОДИН коннект с хостом
+- бут с сохранённым SD — `Ready in SD Mode!`, без рестарта, Wi-Fi в фоне,
+  smartstart играет SD; перезагрузка в радио-режиме — штатно
 
 ### 2026-11-22 — Маршрутизатор аудио (audioroute) + конфиг v6
 **Что:** новый модуль маршрутизации src/core/audioroute.h/.cpp — две оси:
@@ -390,6 +440,5 @@ parseSsid (трёхколоночный, с параметром по умолч
 - src/core/config.cpp — отключён блок #if defined(SD_SPIPINS) || SD_HSPI
   (автостарт SDSPI закомментирован; SD поднимается лениво, по обращению)
 - src/core/options.h — SD_HSPI отключён (#ifndef SD_HSPI закомментирован)
-
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом
