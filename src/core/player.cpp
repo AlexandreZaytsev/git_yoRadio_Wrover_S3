@@ -4,7 +4,10 @@
 #include "telnet.h"
 #include "display.h"
 #include "sdmanager.h"
+
 #include "audioroute.h"
+#include "network.h"
+
 #include "netserver.h"
 #include "timekeeper.h"
 #include "../displays/tools/l10n.h"
@@ -216,6 +219,8 @@ void Player::loop() {
         }
         break;
 */
+
+/*
         if(config.getMode()==PM_SDCARD){
           if(!sdman.cardPresent()){
             Serial.println("[SDM] card lost -> откат на RADIO");
@@ -224,10 +229,24 @@ void Player::loop() {
             config.changeMode(PM_WEB);
             config.initPlaylistMode();
             netserver.requestOnChange(MODE, 0);
-            player.sendCommand({PR_PLAY, config.lastStation()});
+
+            // PR_PLAY не нужен: changeMode сам отправит PR_PLAY,
+            // т.к. плеер ещё числится запущенным (pir == true)
+//            player.sendCommand({PR_PLAY, config.lastStation()});
           }
         }
-        
+*/
+
+        if(config.getMode()==PM_SDCARD && network.status==CONNECTED){
+          if(!sdman.cardPresent()){
+            Serial.println("[SDM] card lost -> откат на RADIO");
+            sdman.stop();
+            audioroute::onSourceLost();
+            config.changeMode(PM_WEB);
+            config.initPlaylistMode();
+            netserver.requestOnChange(MODE, 0);
+          }
+        }
         break;
 
         }

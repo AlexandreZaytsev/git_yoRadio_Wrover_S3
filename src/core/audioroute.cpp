@@ -14,6 +14,8 @@
 #include "player.h"
 #include "sdmanager.h"
 
+#include "network.h"
+
 namespace audioroute {
 
 static AudioSource s_source = AudioSource::RADIO;
@@ -87,13 +89,21 @@ bool begin() {
   if (!srcAllowed(s_source)) s_source = AudioSource::RADIO;
   if (!sinkAllowed(s_sink))  s_sink   = AudioSink::LOCAL;
 
-  // Режим плеера выравниваем с источником, но НЕ запускаем
+ // Режим плеера выравниваем с источником, но НЕ запускаем
   // воспроизведение — его сделает smartstart или первое нажатие.
   int want = (s_source == AudioSource::SD) ? PM_SDCARD : PM_WEB;
   if (config.getMode() != want) {
-    config.changeMode(want);
-    config.initPlaylistMode();
+    if (network.status == CONNECTED) {
+      config.changeMode(want);
+      config.initPlaylistMode();
+    } else {
+      // сеть ещё не поднята (SDREADY на буте) — changeMode сейчас
+      // означает ESP.restart(). Выравниваем источник под фактический режим.
+      s_source = (config.getMode() == PM_SDCARD) ? AudioSource::SD : AudioSource::RADIO;
+      save();
+    }
   }
+  
   // конфиг мог быть исправлен (недоступный источник) — синхронизируем
   if ((uint8_t)s_source != config.store.audioSource ||
       (uint8_t)s_sink   != config.store.audioSink) save();
