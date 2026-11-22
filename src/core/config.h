@@ -30,7 +30,7 @@
   #define ESP_ARDUINO_3 1
 #endif
 
-#define CONFIG_VERSION  5
+#define CONFIG_VERSION  6    // было 5
 
 enum playMode_e      : uint8_t  { PM_WEB=0, PM_SDCARD=1 };
 
@@ -133,6 +133,10 @@ struct config_t
   uint16_t  timeSyncInterval;
   uint16_t  timeSyncIntervalRTC;
   uint16_t  weatherSyncInterval;
+
+  uint8_t audioSource = 0;   // 0=RADIO 1=SD (2=BT потом)
+  uint8_t audioSink   = 0;   // 0=LOCAL (1=BT потом)
+
 };
 
 #if IR_PIN!=255
