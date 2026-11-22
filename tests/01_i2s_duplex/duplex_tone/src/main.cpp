@@ -4,7 +4,7 @@
 #define I2S_BCLK 38
 #define I2S_LRC  39
 #define I2S_DOUT 47
-#define I2S_DIN  17
+#define I2S_DIN  8 //17
 
 I2SClass i2s;
 
@@ -16,7 +16,7 @@ const int      CHUNK = 256;
 void setup() {
   Serial.begin(115200);
   delay(500);
-  Serial.println("[FULLDUP] init i2s (TX=47, RX=17 на GND)...");
+  Serial.println("[FULLDUP] init i2s (TX=47, RX=8 на GND)...");
   i2s.setPins(I2S_BCLK, I2S_LRC, I2S_DOUT, I2S_DIN, -1);
   if (!i2s.begin(I2S_MODE_STD, SAMPLE_RATE,
                  I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO)) {
