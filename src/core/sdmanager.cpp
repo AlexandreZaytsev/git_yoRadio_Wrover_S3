@@ -121,12 +121,16 @@ bool SDManager::cardPresent() {
   return true;
 */
 
- if(!ready) return false;
+ if(!ready) { Serial.println("[SDM] cardPresent: not ready"); return false; }
   if(cardType()==CARD_NONE) { Serial.println("[SDM] cardPresent: cardType=NONE"); return false; }
-  File f = open("/");      // форсируем физическую операцию — ловит выдёргивание карты
-  if(!f) { Serial.println("[SDM] cardPresent: open(/) failed"); return false; }
-  f.close();
-  return true;
+  uint32_t ss = sectorSize();
+  if(ss < 1) { Serial.println("[SDM] cardPresent: sectorSize=0"); return false; }
+  uint8_t* buff = (uint8_t*)calloc(ss, 1);
+  if(!buff) return false;
+  bool ok = readRAW(buff, 1);   // физическое чтение — честный детектор выдёргивания
+  free(buff);
+  if(!ok) Serial.println("[SDM] cardPresent: readRAW failed");
+  return ok;
 }
 
 

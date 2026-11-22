@@ -206,6 +206,7 @@ void Player::loop() {
       }
       #ifdef USE_SD
       case PR_CHECKSD: {
+    /* 
         if(config.getMode()==PM_SDCARD){
           if(!sdman.cardPresent()){
             sdman.stop();
@@ -214,7 +215,22 @@ void Player::loop() {
           }
         }
         break;
-      }
+*/
+        if(config.getMode()==PM_SDCARD){
+          if(!sdman.cardPresent()){
+            Serial.println("[SDM] card lost -> откат на RADIO");
+            sdman.stop();
+            audioroute::onSourceLost();
+            config.changeMode(PM_WEB);
+            config.initPlaylistMode();
+            netserver.requestOnChange(MODE, 0);
+            player.sendCommand({PR_PLAY, config.lastStation()});
+          }
+        }
+        
+        break;
+
+        }
       #endif
       case PR_VUTONUS: {
         if(config.vuThreshold>10) config.vuThreshold -=10;
