@@ -4,6 +4,7 @@
 #include "telnet.h"
 #include "display.h"
 #include "sdmanager.h"
+#include "audioroute.h"
 #include "netserver.h"
 #include "timekeeper.h"
 #include "../displays/tools/l10n.h"
@@ -208,6 +209,7 @@ void Player::loop() {
         if(config.getMode()==PM_SDCARD){
           if(!sdman.cardPresent()){
             sdman.stop();
+            audioroute.onSourceLost();   // источник умер — маршрут в конфиг откатываем
             config.changeMode(PM_WEB);
           }
         }

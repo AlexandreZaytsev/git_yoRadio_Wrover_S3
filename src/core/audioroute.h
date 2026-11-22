@@ -48,6 +48,10 @@ void applyRoute();
 /* Сохранить текущий маршрут в конфиг (TODO(1)). */
 void save();
 
+/* SD исчезла на ходу: откат источника на RADIO + сохранение.
+   Вызывать ДО config.changeMode(PM_WEB) — имена функций не вызываем. */
+void onSourceLost();
+
 } // namespace audioroute
 
 #endif // AUDIOROUTE_H

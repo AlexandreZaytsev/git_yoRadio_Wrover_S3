@@ -1,17 +1,18 @@
 /* ============================================================
    audioroute.cpp — реализация маршрутизатора аудио
 
-   Точки интеграции (TODO):
-   (1) конфиг: два поля audioSource / audioSink (0..N), дефолт 0
-   (2) доступность SD: подставить реальную проверку вашего форка
-   (3) переинициализация тракта при смене потребителя
-       (в single core — пустая операция, точка резервируется)
-   (4) останов/запуск потока: единые точки stop()/start()
-       по именам функций вашего форка
-
-   Логика переключения: stop -> смена маршрута -> запуск нового.
+   Сшивка (вместо TODO-заглушек):
+   (1) конфиг: config.store.audioSource / audioSink (CONFIG_VERSION 6)
+   (2) доступность SD: sdman.ready && sdman.cardPresent()
+   (3) тракт потребителя: хук, в single core пусто (dual core — этап 4)
+   (4) останов/запуск: идиома resetPlayer() — resetQueue +
+       PR_STOP + разовый player.loop()
    ============================================================ */
 #include "audioroute.h"
+#include "options.h"
+#include "config.h"
+#include "player.h"
+#include "sdmanager.h"
 
 namespace audioroute {
 
@@ -21,16 +22,18 @@ static AudioSink   s_sink   = AudioSink::LOCAL;
 /* ---------- (2) доступность источников/потребителей ---------- */
 
 static bool sdAvailable() {
-  // TODO(2): подставить реальную проверку вашего форка,
-  // например: return SD_MMC.cardType() != CARD_NONE;
+#if SDC_CS != 255
+  return sdman.ready && sdman.cardPresent();
+#else
   return false;
+#endif
 }
 
 static bool srcAllowed(AudioSource s) {
   switch (s) {
-    case AudioSource::RADIO: return true;
+    case AudioSource::RADIO: return true;  // сеть решает сама: свои ошибки коннекта отработает плеер
     case AudioSource::SD:    return sdAvailable();
-    case AudioSource::BT:    return false;  // dual core: этап 4
+    case AudioSource::BT:    return false; // dual core: этап 4
   }
   return false;
 }
@@ -38,7 +41,7 @@ static bool srcAllowed(AudioSource s) {
 static bool sinkAllowed(AudioSink k) {
   switch (k) {
     case AudioSink::LOCAL:   return true;
-    case AudioSink::BT_A2DP: return false;  // dual core: этап 4
+    case AudioSink::BT_A2DP: return false; // dual core: этап 4
   }
   return false;
 }
@@ -46,55 +49,57 @@ static bool sinkAllowed(AudioSink k) {
 /* ---------- (4) единые точки останова и запуска ---------- */
 
 static void stopCurrent() {
-  // TODO(4): единая точка останова — остановить активный поток.
-  // Радио и SD-плеер: stop() по именам вашего форка.
-  // Важно: останов ДО смены маршрута, чтобы два потока
-  // не дрались за декодер.
+  if (!player.isRunning()) return;   // уже тихо — нечего останавливать
+  player.resetQueue();               // несработавшие чужие команды — вон
+  player.sendCommand({PR_STOP, 0});
+  player.loop();                     // та же идиома, что в resetPlayer(): разово прокрутить очередь
 }
 
 static void startSource(AudioSource s) {
-  switch (s) {
-    case AudioSource::RADIO:
-      // TODO(4): запуск радиопотока — тот же путь,
-      // что и при старте радио сейчас (connecttohost и т.п.)
-      break;
-    case AudioSource::SD:
-      // TODO(4): старт SD-плеера вашего форка
-      break;
-    default:
-      break;
+  int want = (s == AudioSource::SD) ? PM_SDCARD : PM_WEB;
+  if (config.getMode() != want) {
+    config.changeMode(want);
+    config.initPlaylistMode();       // плейлист должен смотреть в файл нужного режима
   }
+  player.sendCommand({PR_PLAY, config.lastStation()});
 }
 
 /* ---------- (3) применение маршрута ---------- */
 
 static void applyRouteNow() {
-  // TODO(3): если потребитель сменился — переинициализация тракта.
-  // В single core LOCAL остаётся единственным потребителем,
-  // поэтому здесь пусто; в dual core — переключение направления
-  // I2S (RX-источник / TX-вывод на Wrover).
+  // Хук потребителя: в single core sink всегда LOCAL, I2S-тракт
+  // поднят один раз в Player::init() — делать нечего.
+  // Dual core: здесь будет переинициализация I2S/TX на Wrover.
   startSource(s_source);
 }
 
 /* ---------- публичный API ---------- */
 
 bool begin() {
-  // TODO(1): восстановить из конфига вашего форка, например:
-  //   int s = config.general.audioSource;
-  //   if (s >= 0 && s <= (int)AudioSource::BT) s_source = (AudioSource)s;
-  //   int k = config.general.audioSink;
-  //   if (k >= 0 && k <= (int)AudioSink::BT_A2DP) s_sink = (AudioSink)k;
-  // Недоступные значения принудительно откатываются на дефолт:
+  int s = config.store.audioSource;
+  int k = config.store.audioSink;
+  if (s >= 0 && s <= (int)AudioSource::BT)    s_source = (AudioSource)s;
+  if (k >= 0 && k <= (int)AudioSink::BT_A2DP) s_sink   = (AudioSink)k;
   if (!srcAllowed(s_source)) s_source = AudioSource::RADIO;
   if (!sinkAllowed(s_sink))  s_sink   = AudioSink::LOCAL;
-  applyRouteNow();
+
+  // Режим плеера выравниваем с источником, но НЕ запускаем
+  // воспроизведение — его сделает smartstart или первое нажатие.
+  int want = (s_source == AudioSource::SD) ? PM_SDCARD : PM_WEB;
+  if (config.getMode() != want) {
+    config.changeMode(want);
+    config.initPlaylistMode();
+  }
+  // конфиг мог быть исправлен (недоступный источник) — синхронизируем
+  if ((uint8_t)s_source != config.store.audioSource ||
+      (uint8_t)s_sink   != config.store.audioSink) save();
   return true;
 }
 
 bool setSource(AudioSource s) {
   if (!srcAllowed(s)) return false;
   if (s == s_source)  return true;
-  stopCurrent();
+  stopCurrent();          // останов ДО смены маршрута — декодер не дёргается
   s_source = s;
   applyRouteNow();
   save();
@@ -102,8 +107,6 @@ bool setSource(AudioSource s) {
 }
 
 bool nextSource() {
-  // циклический перебор только доступных источников:
-  // кнопка «Источник» не застревает на недоступных вариантах
   for (uint8_t i = 1; i <= (uint8_t)AudioSource::BT; i++) {
     AudioSource s = (AudioSource)(((uint8_t)s_source + i) % ((uint8_t)AudioSource::BT + 1));
     if (srcAllowed(s)) return setSource(s);
@@ -122,8 +125,6 @@ bool setSink(AudioSink k) {
 }
 
 bool nextSink() {
-  // в single core доступен только LOCAL — фактический no-op,
-  // но интерфейс уже готов к dual core
   for (uint8_t i = 1; i <= (uint8_t)AudioSink::BT_A2DP; i++) {
     AudioSink k = (AudioSink)(((uint8_t)s_sink + i) % ((uint8_t)AudioSink::BT_A2DP + 1));
     if (sinkAllowed(k)) return setSink(k);
@@ -137,10 +138,18 @@ void applyRoute() {
 }
 
 void save() {
-  // TODO(1): сохранить в конфиг вашего форка, например:
-  //   config.general.audioSource = (uint8_t)s_source;
-  //   config.general.audioSink   = (uint8_t)s_sink;
-  //   config.commit();
+  config.saveValue(&config.store.audioSource, (uint8_t)s_source);
+  config.saveValue(&config.store.audioSink,   (uint8_t)s_sink);
+}
+
+/* SD исчезла на ходу — источник недоступен, маршрут откатывается.
+   Вызывается из PR_CHECKSD ДО changeMode: без рестарта плеера,
+   без рентрантности player.loop(). */
+void onSourceLost() {
+  if (s_source == AudioSource::SD) {
+    s_source = AudioSource::RADIO;
+    save();
+  }
 }
 
 AudioSource source() { return s_source; }
