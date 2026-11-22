@@ -209,7 +209,7 @@ void Player::loop() {
         if(config.getMode()==PM_SDCARD){
           if(!sdman.cardPresent()){
             sdman.stop();
-            audioroute.onSourceLost();   // источник умер — маршрут в конфиг откатываем
+            audioroute::onSourceLost();   // источник умер — маршрут в конфиг откатываем
             config.changeMode(PM_WEB);
           }
         }

@@ -76,6 +76,10 @@ static void applyRouteNow() {
 /* ---------- публичный API ---------- */
 
 bool begin() {
+  /* --- ТЕСТ: принудительный источник SD (убрать после отладки) --- */
+  s_source = AudioSource::SD;
+
+
   int s = config.store.audioSource;
   int k = config.store.audioSink;
   if (s >= 0 && s <= (int)AudioSource::BT)    s_source = (AudioSource)s;

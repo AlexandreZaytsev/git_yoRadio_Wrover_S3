@@ -33,6 +33,7 @@
 #define I2S_DOUT            47
 #define I2S_BCLK            38
 #define I2S_LRC             39
+#define I2S_DIN             -1   // на ALT входа нет (нет Wrover-входа): 4-й аргумент setPinout обязан быть определён
 
 /* ---------- VS1053 — отключён (255) ---------- */
 #define VS1053_CS           255

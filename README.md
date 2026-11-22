@@ -221,6 +221,24 @@ Reengineering base release yoradio v0.9.693
 **Изменённые файлы:** config/myoptions_s3.h (I2S_DIN 8, IR_PIN 18),
 tests/01_i2s_duplex/duplex_tone/src/main.cpp
 
+## маршрутизатор аудио (audioroute) — этап: сшивка TODO(2)(4)
+
+Что сделано:
+- `src/core/audioroute.cpp` — вместо заглушек:
+  доступность SD = `sdman.ready && sdman.cardPresent()`;
+  единая точка останова `stopCurrent()` по идиоме `resetPlayer()` (resetQueue + PR_STOP + разовый loop);
+  запуск источника через `changeMode()` + `PR_PLAY(config.lastStation())`
+- `src/core/audioroute.h` — добавлен `onSourceLost()`: откат источника на RADIO при пропаже карты
+- `src/core/player.cpp` — `PR_CHECKSD` теперь синхронизирует маршрут: без этого конфиг оставался бы «SD» при мёртвой карте
+- `src/main.cpp` — `audioroute::begin()` после `config.initPlaylistMode()`, до smartstart: маршрут восстанавливается из конфига, недоступный источник откатывается
+- TODO(3) — хук сохранён (реализуется на dual core), TODO(5) — валидация BT-комбинаций (dual core)
+
+Тесты:
+- бут с дефолтным маршрутом (RADIO) — поведение не изменилось
+- выдёргивание карты на ходу в PM_SDCARD — `PR_CHECKSD` откатывает на радио, конфиг перезаписывается
+
+
+
 ### 2026-11-22 — Маршрутизатор аудио (audioroute) + конфиг v6
 **Что:** новый модуль маршрутизации src/core/audioroute.h/.cpp — две оси:
 источник (Радио/SD/BT-заглушка) и потребитель (Speakers/BT_A2DP-заглушка).
