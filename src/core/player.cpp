@@ -4,6 +4,10 @@
 #include "telnet.h"
 #include "display.h"
 #include "sdmanager.h"
+
+#include "audioroute.h"
+#include "network.h"
+
 #include "netserver.h"
 #include "timekeeper.h"
 #include "../displays/tools/l10n.h"
@@ -13,6 +17,34 @@
 #endif
 Player player;
 QueueHandle_t playerQueue;
+
+// ===== Этап 3: RX-дебаг (полный дуплекс) =====
+#ifdef I2S_RX_DEBUG
+static TaskHandle_t rxDebugTask = nullptr;
+
+static void rxDebugLoop(void* arg) {
+  static uint8_t buf[1024];
+  static uint32_t total = 0, nonzero = 0;
+  size_t n;
+  uint32_t last = millis();
+  for (;;) {
+    if (i2s_read(I2S_NUM_0, buf, sizeof(buf), &n, portMAX_DELAY) == ESP_OK && n > 0) {
+      total += n;
+      for (size_t i = 0; i < n; i++) if (buf[i]) nonzero++;
+    }
+    uint32_t now = millis();
+    if (now - last > 5000) {
+      last = now;
+      Serial.printf("[RX] %u байт/5с, ненулевых: %u\n", (unsigned)total, (unsigned)nonzero);
+      total = 0; nonzero = 0;
+    }
+  }
+}
+#endif
+// ===== Этап 3: RX-дебаг (полный дуплекс) =====
+
+
+
 
 #if VS1053_CS!=255 && !I2S_INTERNAL
   #if VS_HSPI
@@ -50,7 +82,11 @@ void Player::init() {
   if(MUTE_PIN!=255) pinMode(MUTE_PIN, OUTPUT);
   #if I2S_DOUT!=255
     #if !I2S_INTERNAL
-      setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+    // было:
+    //  setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+    //стало 
+    setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT, I2S_DIN);
+    
     #endif
   #else
     SPI.begin();
@@ -69,6 +105,13 @@ void Player::init() {
   _loadVol(config.store.volume);
   setConnectionTimeout(CONNECTION_TIMEOUT, CONNECTION_TIMEOUT_SSL);
   Serial.println("done");
+
+  // ===== Этап 3: RX-дебаг (полный дуплекс) =====
+#ifdef I2S_RX_DEBUG
+    xTaskCreatePinnedToCore(rxDebugLoop, "rx_dbg", 4096, NULL, 1, &rxDebugTask, 0);
+  #endif
+// ===== Этап 3: RX-дебаг (полный дуплекс) =====  
+
 }
 
 void Player::sendCommand(playerRequestParams_t request){
@@ -166,14 +209,22 @@ void Player::loop() {
       }
       #ifdef USE_SD
       case PR_CHECKSD: {
-        if(config.getMode()==PM_SDCARD){
+// Карта исчезла на ходу: откатываем маршрут на RADIO.
+        // Меняем режим только при поднятой сети — иначе changeMode(PM_WEB)
+        // при SDREADY упрётся в ESP.restart() из config.cpp.
+        if(config.getMode()==PM_SDCARD && network.status==CONNECTED){
           if(!sdman.cardPresent()){
+            Serial.println("[SDM] card lost -> откат на RADIO");
             sdman.stop();
+            audioroute::onSourceLost();
             config.changeMode(PM_WEB);
+            config.initPlaylistMode();
+            netserver.requestOnChange(MODE, 0);
           }
         }
         break;
-      }
+
+        }
       #endif
       case PR_VUTONUS: {
         if(config.vuThreshold>10) config.vuThreshold -=10;

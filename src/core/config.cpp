@@ -137,6 +137,11 @@ void Config::_setupVersion(){
       saveValue(&store.timeSyncInterval, (uint16_t)60);    //min
       saveValue(&store.timeSyncIntervalRTC, (uint16_t)24); //hours
       saveValue(&store.weatherSyncInterval, (uint16_t)30); // min
+      break;
+    case 5:
+        saveValue(&store.audioSource, (uint8_t)0);
+        saveValue(&store.audioSink,   (uint8_t)0);
+        break;      
     default:
       break;
   }
@@ -613,6 +618,10 @@ void Config::setDefaults() {
   store.timeSyncInterval = 60;    //min
   store.timeSyncIntervalRTC = 24; //hour
   store.weatherSyncInterval = 30; //min
+
+  store.audioSource = 0;
+  store.audioSink = 0;
+
   eepromWrite(EEPROM_START, store);
 }
 

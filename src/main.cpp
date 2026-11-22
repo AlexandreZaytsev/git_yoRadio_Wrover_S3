@@ -8,6 +8,7 @@
 #include "core/network.h"
 #include "core/netserver.h"
 #include "core/controls.h"
+#include "core/audioroute.h"
 #include "core/mqtt.h"
 #include "core/optionschecker.h"
 #include "core/timekeeper.h"
@@ -112,6 +113,7 @@ void setup() {
     Serial.print("##[BOOT]#\tSD search\t");
   }
   config.initPlaylistMode();
+  audioroute::begin();   // восстановить маршрут из конфига, сверить с реальностью (SD есть/нет)
   netserver.begin();
   telnet.begin();
   initControls();

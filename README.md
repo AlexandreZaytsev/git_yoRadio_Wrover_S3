@@ -1,6 +1,3 @@
-
-
-
 # git_yoRadio_Wrover_S3
 > Platformio клоны Arduino сборки [ёРадио](https://github.com/e2002/yoradio/?ysclid=mvw0c4k7jv370463529) Releases v0.9.693  
 
@@ -35,14 +32,14 @@ platformio.ini
 ```
 ;default_envs = esp32-wrover-kit
 ;default_envs = esp32-s3-kit
-default_envs = esp32-s3-devkitc-1-alt`
+default_envs = esp32-s3-devkitc-1-alt
 ```
 config/myoptions_s3_alt.h
 ```
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49`
+#define SDC_CS      49
 ```
 ![3d](/hardware/kompas_3d/asm.png)    
 ![v1](/hardware/release_v2.png)    
@@ -60,14 +57,14 @@ platformio.ini
 ```
 ;default_envs = esp32-wrover-kit
 default_envs = esp32-s3-kit
-;default_envs = esp32-s3-devkitc-1-alt`
+;default_envs = esp32-s3-devkitc-1-alt
 ```
 config/myoptions_s3.h
 ```
 // SDC_CS: реального CS в SDIO нет, но значение !=255 нужно, чтобы
 // включилась компиляция USE_SD. Ставим заведомо несуществующий GPIO 49 —
 // пин никуда не подключается и ни с чем не конфликтует.
-#define SDC_CS      49`
+#define SDC_CS      49
 ```    
 
 xls pinout (/hardware/youradio Wrover_S3-pinout.xlsx)    
@@ -186,7 +183,7 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/network.cpp изменена функция void MyNetwork::WiFiLostConnection(WiFiEvent_t event, WiFiEventInfo_t info)
    - [x] /data/www/script.js.gz изменена функция function handleWiFiData(fileData)
    - [x] /data/www/script.js.gz изменена функция function submitWiFi()
-   - [x] /data/www/options.html.gz ljдобавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
+   - [x] /data/www/options.html.gz добавлено 10 блоков <input type="text" id="label0" maxlength="15" placeholder="Короткое имя" />
    - [x] /src/core/netserver.cpp изменена функция void NetServer::chunkedHtmlPage кеш на имена wifi сетей и плейлист отключаем (имена wifi при редактировании теперь сохраняются в файле wifi.csv playlist.csv на флеш памяти)  
 - отображение дескриптора wifi сети вместо имени
    - [x] /src/core/config.h расширен class Config {
@@ -196,7 +193,6 @@ Reengineering base release yoradio v0.9.693
 - показать инфо экран в браузере команда http://<ip-радио>/?dspinfo=1  
    - [x] /src/core/commandhandler.cpp в конце exec
    - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
-   - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
    - [x] /src/core/display.cpp дополнена функция void Display::loop() {
 - рисуем свою страницу инфо
    - [x] /src/core/common.h добавляем enum pages_e
@@ -205,5 +201,244 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/display.cpp Page *pages[] меняем _buildPager()
    - [x] /src/core/display.cpp Page *pages[] меняем _swichMode()
 - переход на версию ядра 3 (espressif32@~8.0.0)
+
+## История изменений
+<!-- ======= даты «XX» и «(ранняя)» уточняются по git log --date=short;
+     в каждую запись «Что» можно дописать «Коммит: a1b2c3d» ======= -->
+### 2026-11-22 — Фикс бут-петли в SD-режиме + чистый откат PR_CHECKSD
+**Что:** бут с сохранённым SD падал в петлю рестартов (RTC_SW_CPU_RST через
+~100 мс после SD indexing, детерминированно). Причина: `audioroute::begin()`
+при расхождении `play_mode` с маршрутом звал `changeMode(PM_WEB)`, а штатный
+`changeMode` при `network.status==SDREADY` делает `ESP.restart()` — Wi-Fi ещё
+не был поднят (поднимается фоновой задачей `searchWiFi`). Теперь режим
+выравнивается только при `CONNECTED`, иначе источник подгоняется под
+фактический `play_mode` с сохранением в конфиг. Заодно из `PR_CHECKSD` убран
+дублирующий `PR_PLAY` — `changeMode` сам отправляет его (плеер ещё числится
+запущенным, `pir == true`), было двойное «Connect to new host» при откате.
+Откат дополнен проверкой `network.status==CONNECTED`
+(+ `#include "network.h"` в player.cpp).
+**Изменённые файлы:**
+- src/core/audioroute.cpp — ветка выравнивания в begin(), инклюд network.h
+- src/core/player.cpp — PR_CHECKSD: чистый откат, проверка сети, чистка мёртвого кода
+**Проверено:**
+- бут с сохранённым SD — `Ready in SD Mode!`, играет без рестарта, Wi-Fi в фоне;
+- выдёргивание карты на ходу — откат за ~0.5 сек, ОДИН коннект, радио играет;
+- бут в радио-режиме — штатный, без регрессий.
+
+### Этап 2 — Пин-обмен: DIN ↔ IR (СДЕЛАНО, подтверждено тестами)
+**Что:** I2S DIN перенесён с GPIO17 на GPIO8, IR-приёмник — с GPIO8 на GPIO18.
+Резерв DIN — GPIO17 (освободился). GPIO45 рассмотрен и отклонён:
+стрэппинг VDD_SPI, риск на каждом холодном старте.
+**Проверено (два уровня):**
+  - изолированный тест (tests/01_i2s_duplex/duplex_tone): счётчик ровный,
+    реакция на замыкание DIN(8)→GND — поток вырождается в нули;
+  - основной yoRadio: [RX] 882688 байт/5с (расчётные 882000), замыкание
+    DIN(8)→GND — ненулевых: 0 при живом байтовом счётчике.
+**Изменённые файлы:** config/myoptions_s3.h (I2S_DIN 8, IR_PIN 18),
+tests/01_i2s_duplex/duplex_tone/src/main.cpp
+
+## маршрутизатор аудио (audioroute) — этап: сшивка TODO(2)(4)
+
+Что сделано:
+- `src/core/audioroute.cpp` — вместо заглушек:
+  доступность SD = `sdman.ready && sdman.cardPresent()`;
+  единая точка останова `stopCurrent()` по идиоме `resetPlayer()` (resetQueue + PR_STOP + разовый loop);
+  запуск источника через `changeMode()` + `PR_PLAY(config.lastStation())`
+- `src/core/audioroute.h` — добавлен `onSourceLost()`: откат источника на RADIO при пропаже карты
+- `src/core/player.cpp` — `PR_CHECKSD` теперь синхронизирует маршрут: без этого конфиг оставался бы «SD» при мёртвой карте
+- `src/main.cpp` — `audioroute::begin()` после `config.initPlaylistMode()`, до smartstart: маршрут восстанавливается из конфига, недоступный источник откатывается
+- TODO(3) — хук сохранён (реализуется на dual core), TODO(5) — валидация BT-комбинаций (dual core)
+
+### Поведение при старте (важно — это отклонение от штатной логики yoRadio)
+- сеть поднимается в фоне: при сохранённом источнике SD `network.begin()`
+  ставит статус `SDREADY` и запускает Wi-Fi задачей `searchWiFi` на core 0;
+- выравнивание режима плеера с маршрутом выполняется ТОЛЬКО при
+  `network.status == CONNECTED`. При `SDREADY` источник подгоняется под
+  фактический режим (`play_mode`), `changeMode()` не вызывается.
+  Причина: штатный `config.cpp::changeMode()` при переходе на PM_WEB
+  в состоянии SDREADY делает `ESP.restart()` («смена режима без сети →
+  рестарт») — вызов из бута давал детерминированную петлю перезагрузок
+  (RTC_SW_CPU_RST после SD indexing, 3 из 3 бутов);
+- запуск воспроизведения из конфига остаётся за smartstart.
+
+### Откат при потере SD (PR_CHECKSD)
+Периодическая проверка карты в player.cpp. При PM_SDCARD и
+`!sdman.cardPresent()` и `network.status == CONNECTED`:
+1. `sdman.stop()` — останов декодера;
+2. `audioroute::onSourceLost()` — маршрут в конфиге откатывается на RADIO;
+3. `config.changeMode(PM_WEB)` — он САМ отправит PR_PLAY (плеер ещё
+   числится запущенным, `pir == true`); отдельный PR_PLAY не нужен —
+   иначе двойное соединение с хостом;
+4. `netserver.requestOnChange(MODE, 0)` — уведомление вебморды.
+
+Проверка сети перед откатом обязательна: без неё откат в первые секунды
+после бута (пока searchWiFi не поднял Wi-Fi) снова упирается в рестарт
+из config.cpp. При отсутствии сети откат просто перенесётся на следующий
+тик (2 сек).
+
+### Известные ограничения
+- BT-источник и BT_A2DP-потребитель — этап dual core
+  (`srcAllowed`/`sinkAllowed` всегда false);
+- `Player::initHeaders` — чтение тегов ID3 до старта не реализовано
+  (заглушка `|| true`).
+
+Тесты:
+- бут с дефолтным маршрутом (RADIO) — поведение не изменилось
+- выдёргивание карты на ходу в PM_SDCARD — `PR_CHECKSD` откатывает на радио,
+  конфиг перезаписывается, ОДИН коннект с хостом
+- бут с сохранённым SD — `Ready in SD Mode!`, без рестарта, Wi-Fi в фоне,
+  smartstart играет SD; перезагрузка в радио-режиме — штатно
+
+### 2026-11-22 — Маршрутизатор аудио (audioroute) + конфиг v6
+**Что:** новый модуль маршрутизации src/core/audioroute.h/.cpp — две оси:
+источник (Радио/SD/BT-заглушка) и потребитель (Speakers/BT_A2DP-заглушка).
+Заглушки BT отклоняются в setSource/setSink, next* перебирает только
+доступные варианты — интерфейс не даёт выбрать недоступное. applyRoute() —
+единая точка «stop -> смена маршрута -> запуск нового». Выбор сохраняется
+в конфиг. Изначально модуль назывался audiosrc, переименован в audioroute
+(точнее отражает две оси маршрута).
+**Изменённые файлы:**
+- src/core/audioroute.h, src/core/audioroute.cpp — новые
+- src/core/config.h — поля audioSource/audioSink в конце config_t,
+  CONFIG_VERSION 5 -> 6
+- src/core/config.cpp — setDefaults(), миграция case 5 (нули в EEPROM),
+  break в case 4 (убрано падение в default)
+**Проверено:** раскладка EEPROM: старые поля до 249, новые 250-251,
+итого 500+252=752 при лимите 768 (запас 16 байт); адреса старых полей
+не сдвинулись — сброса конфига нет. Миграция 5->6 срабатывает один раз
+(лог CONFIG_VERSION 6); мусорные значения откатываются второй линией
+защиты в audioroute::begin().
+**Известные ограничения:** TODO(2) доступность SD (пока false),
+TODO(3) переинициализация тракта потребителя (в single core пусто),
+TODO(4) останов/запуск потока — сшиваются по player.cpp.
+
+### 2026-11-XX — Решение: single core -> dual core
+**Что:** принято решение завершить single core финальным релизом
+(последняя фича — выбор источника SD/WiFi-радио в интерфейсе), затем
+перенести весь пласт (дуплекс, маршрутизатор) в dual core и развивать там.
+Файл плана: docs/plan-single-to-dual.md. Рассматривался вариант взять
+готовый BT-модуль jradio-bt — отклонён для этапа 3б (другая архитектура:
+там модуль — мастер I2S, у нас S3 мастер). Взято за основу: ESP32-A2DP
+в режиме I2S_MODE_SLAVE | I2S_MODE_TX на Wrover (план Б).
+Заметка: BT-источник (Wrover = A2DP sink, поток по I2S) и BT-потребитель
+(Wrover = A2DP source) — два разных режима Wrover, одновременно
+недопустимы; валидация комбинаций добавляется в setSource/setSink
+на этапе dual core.
+
+### 2026-11-XX — Этап 3а: RX-счётчик дуплекса
+**Что:** отладочный счётчик RX-канала I2S (rxDebugLoop в player.cpp):
+раз в 5 секунд — принято байт / из них ненулевых. Защита I2S_RX_DEBUG.
+**Изменённые файлы:** src/core/player.cpp
+**Проверено:** [RX] 882688 байт/5с, ненулевых: 0; контрольное замыкание
+DIN(8) -> GND: ненулевые падают в 0 — вход читается корректно.
+
+### 2026-11-XX — Этап 2: интеграция RX-канала в прошивку
+**Что:** I2S переведён в дуплекс (TX+RX одновременно); setPinout()
+с четвёртым аргументом I2S_DIN. Обмен пинами: I2S_DIN 17 -> 8
+(вход потока от Wrover), IR_PIN 8 -> 18 (ИК-приёмник переезжает).
+**Изменённые файлы:** myoptions_s3.h, src/core/player.cpp
+**Проверено:** радио играет, [RX] 882688 байт/5с, ненулевых: 0.
+
+### 2026-11-XX — Этап 1: изолированный тест дуплекса
+**Что:** отдельный скетч вне проекта: TX+RX на одном чипе, счётчик
+RX-байтов. Доказательство жизнеспособности дуплекса до трогания прошивки.
+**Проверено:** 882688 байт/5с, ненулевых 0 — дуплекс работает.
+
+<!-- ======= ранние правки: порядок/даты восстановить по коммитам ======= -->
+
+### (ранняя) — Переход на версию ядра 3 (espressif32@~8.0.0)
+**Что:** обновление фреймворка платформы в platformio.ini.
+**Изменённые файлы:** platformio.ini
+
+### (ранняя) — Своя страница INFO на дисплее
+**Что:** вместо диалога при входе в INFO — отдельная страница:
+дескриптор сети крупно, ниже колонкой SSID, IP, RSSI (дБм), свободная
+память. Автовозврат в плеер через 10 секунд. Расширение pages[] до 5
+страниц (_buildPager, _swichMode). Веб-экран dspinfo по команде
+?dspinfo=1 — добавлен в commandhandler.
+**Изменённые файлы:**
+- src/core/common.h — enum pages_e
+- src/core/display.h — приватные члены FillWidget/TextWidget, _infoShown
+- src/core/display.cpp — страница INFO, _buildPager(), _swichMode(), loop()
+- src/core/commandhandler.cpp — exec, ?dspinfo=1
+
+### (ранняя) — Страховка пропущенного PSTART на старте с SD
+**Что:** на холодном старте с SD плеер играет раньше, чем строится экран:
+событие PSTART теряется, VU оставался залочен. Фикс: в _start() VU лочится
+только если он выключен в настройках ИЛИ плеер ещё не играет; в loop() —
+однократная страховка (плеер играет, VU залочен -> принудительная
+раскладка). WEB-режим не затронут.
+**Изменённые файлы:** src/core/display.cpp (строки 311, 327, 471)
+
+### (ранняя) — Ограничение громкости: volToI2S() + MAX_VOL
+**Что:** ограничение громкости (чтобы динамики не «пожечь» по ВЧ)
+при сохранении диапазона энкодера 0..254: значение ручки размазывается
+на диапазон 0..MAX_VOL с учётом per-station offset (config.station.ovol).
+Звук физически не превышает MAX_VOL, ручка визуально доходит до конца.
+Альтернатива (жёсткое отсечение map(..., 0, 254)) задокументирована
+в комментарии к функции.
+**Изменённые файлы:**
+- config/myoptions_wrover.h, config/myoptions_s3_alt.h — MAX_VOL 190
+- src/core/player.cpp — переписана Player::volToI2S(uint8_t)
+**Отменено:** переменная VOL_WARN_ZONE 20 (зона плавного изменения
+цвета) — убрана из myoptions.
+**Проверено:** (заполнить: как проверяли — на слух/измерением?)
+
+### (ранняя) — Отображение превышения громкости цветом
+**Что:** индикация выхода за лимит MAX_VOL: полоса и цифры в диалоге —
+сырые данные 0..255 (ручка), число внизу — фактическое значение на ЦАПе
+(volToI2S). Цвет числа и цифр плавно подкрашивается VOL_OVER_COLOR:
+t = 0 до лимита, далее линейно до 255 при ручке 254.
+**Изменённые файлы:**
+- config/myoptions_wrover.h, config/myoptions_s3_alt.h — VOL_OVER_COLOR
+- src/displays/widgets/widgets.h — Widgets::setFgColor(uint16_t)
+- src/core/display.cpp — blendColor() (RGB565, пропорция 0..255),
+  переписана Display::_volume()
+
+### (ранняя) — Mute усилителя: плагин ampmute
+**Что:** мьют внешнего усилителя (HT8698, вход CTRL) по состоянию плеера;
+снятие мьюта (ставим 1) после подключения к WiFi (Config::initNetwork).
+Инициализация в setup() ДО ветвления AP-режима — работает и в AP;
+loop() в главном цикле. Пин — AMP_MUTE_GPIO.
+**Изменённые файлы:**
+- src/core/ampmute.h, src/core/ampmute.cpp — новый плагин
+- src/main.cpp — init до AP-ветвления, loop()
+
+### (ранняя) — Гашение встроенного RGB-LED на GPIO48 (S3)
+**Что:** светодиод WS2812 на плате S3 защёлкивал наводки с «висящего»
+пина. Было: neopixelWrite(48,0,0,0). Стало: rgbLedWrite(48,0,0,0) +
+pinMode(48, OUTPUT) + digitalWrite(48, LOW) — нулевой кадр и удержание
+линии в LOW. Для Wrover-ветки — пусто (WS2812 на плате нет).
+**Изменённые файлы:** src/main.cpp
+**Проверено:** (заполнить)
+
+### (ранняя) — Дескрипторы WiFi-сетей (label) + расширение до 10 сетей
+**Что:** wifi.csv получил третью колонку — дескриптор сети. Переписан
+parseSsid (трёхколоночный, с параметром по умолчанию — старые вызовы
+работают), initNetwork читает и сохраняет label, добавлена labelBySsid()
+(без дескриптора — сам SSID). Дескриптор показывается на бут-экране
+(BOOTSTRING) и в _swichMode вместо «сырого» SSID. Список сетей расширен
+с 5 до 10 (neworkItem ssids[10]); в вебморду добавлено +5 полей
+(options.html.gz, script.js.gz: handleWiFiData, submitWiFi);
+кеш имён wifi/плейлиста в chunkedHtmlPage отключён — имена сохраняются
+в wifi.csv/playlist.csv во флеш-памяти.
+**Изменённые файлы:**
+- src/core/config.h, src/core/config.cpp — labelBySsid, parseSsid,
+  initNetwork, BootString
+- src/core/netserver.h, netserver.cpp — handleIndex, chunkedHtmlPage
+- src/core/network.cpp — wifiBegin, WiFiLostConnection
+- src/core/display.cpp — _swichMode, case BOOTSTRING
+- data/www/options.html.gz, data/www/script.js.gz — +5 полей, JS
+
+### (ранняя) — SD в режиме SDIO (сборка s3 alt)
+**Что:** в /config/myoptions_s3_alt.h включена поддержка SD в режиме SDIO
+(короткие провода). SDC_CS = 49 — фиктивный (реального CS в SDIO нет,
+!=255 нужен для компиляции USE_SD).
+**Изменённые файлы:**
+- src/core/sdmanager.h — заменён целиком
+- src/core/sdmanager.cpp — инклюды, start()/stop()/cardPresent()
+- src/core/config.cpp — отключён блок #if defined(SD_SPIPINS) || SD_HSPI
+  (автостарт SDSPI закомментирован; SD поднимается лениво, по обращению)
+- src/core/options.h — SD_HSPI отключён (#ifndef SD_HSPI закомментирован)
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом

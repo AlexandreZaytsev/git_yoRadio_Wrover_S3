@@ -73,6 +73,27 @@ bool SDManager::cardPresent() {
 
 //Алиса
 bool SDManager::start(){
+
+// IDF5 (ядро 3.x) не включает внутренние подтяжки SDMMC сам — делаем это явно.
+  // На ядре 2.x этого не требовалось, отсюда «на 2-м работало».
+  gpio_pullup_en((gpio_num_t)SDIO_SCK);
+  gpio_pullup_en((gpio_num_t)SDIO_CMD);
+  gpio_pullup_en((gpio_num_t)SDIO_D0);
+  gpio_pullup_en((gpio_num_t)SDIO_D1);
+  gpio_pullup_en((gpio_num_t)SDIO_D2);
+  gpio_pullup_en((gpio_num_t)SDIO_D3);
+
+  /*
+    #define SDIO_SCK    7
+    #define SDIO_CMD    6
+    #define SDIO_D0     15
+    #define SDIO_D1     16
+    #define SDIO_D2     4
+    #define SDIO_D3     5
+*/
+
+ Serial.printf("[SDM] start() вызван, свободно heap=%u\n", (unsigned)ESP.getFreeHeap());
+
   setPins(SDIO_SCK, SDIO_CMD, SDIO_D0, SDIO_D1, SDIO_D2, SDIO_D3);
   ready = begin("/sdcard", false);        // 4-битный режим
   vTaskDelay(10);
@@ -91,12 +112,25 @@ void SDManager::stop(){
 }
 
 bool SDManager::cardPresent() {
+/*    
   if(!ready) return false;
   if(cardType()==CARD_NONE) return false;
   File f = open("/");      // форсируем физическую операцию — ловит выдёргивание карты
   if(!f) return false;
   f.close();
   return true;
+*/
+
+ if(!ready) { Serial.println("[SDM] cardPresent: not ready"); return false; }
+  if(cardType()==CARD_NONE) { Serial.println("[SDM] cardPresent: cardType=NONE"); return false; }
+  uint32_t ss = sectorSize();
+  if(ss < 1) { Serial.println("[SDM] cardPresent: sectorSize=0"); return false; }
+  uint8_t* buff = (uint8_t*)calloc(ss, 1);
+  if(!buff) return false;
+  bool ok = readRAW(buff, 1);   // физическое чтение — честный детектор выдёргивания
+  free(buff);
+  if(!ok) Serial.println("[SDM] cardPresent: readRAW failed");
+  return ok;
 }
 
 

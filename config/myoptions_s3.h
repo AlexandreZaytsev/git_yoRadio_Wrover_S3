@@ -57,6 +57,8 @@ DISPOFF = белый, не чёрный на вашей панели — зна�
 #define I2S_DOUT            47
 #define I2S_BCLK            38
 #define I2S_LRC             39
+#define I2S_DIN  8    //полный дуплекс  вход потока от Wrover (BT), резерв — GPIO17 (был 17)
+
 
 /* ---------- VS1053 — отключён (255) ---------- */
 #define VS1053_CS           255
@@ -76,7 +78,9 @@ DISPOFF = белый, не чёрный на вашей панели — зна�
 #define ENC2_HALFQUARD      false
 
 /* ---------- ИК-приёмник ---------- */
-#define IR_PIN              8
+//#define IR_PIN              8
+#define IR_PIN              18    // обменялись с DIN: DIN на 8, IR на 18 (был 8)
+
 #define IR_TIMEOUT          80
 
 /* ---------- TOUCHSCREEN — не используется ---------- */
@@ -138,5 +142,11 @@ DISPOFF = белый, не чёрный на вашей панели — зна�
 #define FULL_SCR_CLOCK false
 //#define CORE_STACK_SIZE  1024*16   // тест: 16 КБ вместо 4
 //#define DEF_SPI_FREQ    20000000UL
+
+
+/* ---------- Этап 3: RX-дебаг (полный дуплекс) ---------- */
+#define I2S_RX_DEBUG        1    // 1 = фоновая задача читает RX и пишет счётчик; после проверки — 0
+
+
 
 #endif
