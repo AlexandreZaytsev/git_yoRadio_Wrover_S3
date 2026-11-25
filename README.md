@@ -142,12 +142,13 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/options.h    
 - /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная #define AMP_MUTE_GPIO (пин управлени mute)    
    - [x] в /src/main.cpp отключаем mute (ставим 1) усилка после подключения к wifi    
-- добавлено ограничение громкости (чтобы динамики не 'пожечь' по вч) при сохранении диапазона энкодера 255
+- добавлено ограничение громкости volToI2S() + MAX_VOL ограничение громкости (чтобы динамики не «пожечь» по ВЧ)
+при сохранении диапазона энкодера 0..254: значение ручки размазывается на диапазон 0..MAX_VOL с учётом per-station offset (config.station.ovol). Звук физически не превышает MAX_VOL, ручка визуально доходит до конца. Альтернатива (жёсткое отсечение map(..., 0, 254)) задокументирована в комментарии к функции
    - [x] /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная MAX_VOL 190    
    - [x] ~~/config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная VOL_WARN_ZONE 20 зона плавного изменения цвета~~    
    - [x] /src/core/player.cpp переписана функция - uint8_t Player::volToI2S(uint8_t volume)  
-- добавлено отображение превышения громкости - основная цифра и полоса сырые данные 0-255, число внизу данные на ЦАП, цвет на превышение лимита MAX_VOL ~~в зоне VOL_WARN_ZONE~~   
-   - [x] /src/displays/widgets/widgets.h в классе Widgets добавлена функция setFgColor(uint16_t color)
+- добавлено отображение превышения громкости (индикация выхода за лимит MAX_VOL: полоса и цифры в диалоге — сырые данные 0..255 (ручка), число внизу — фактическое значение на ЦАПе (volToI2S). Цвет числа и цифр плавно подкрашивается VOL_OVER_COLOR: t = 0 до лимита, далее линейно до 255 при ручке 254)  
+   - [x] /src/displays/widgets/widgets.h в классе Widgets добавлена функция setFgColor(uint16_t color) (RGB565, пропорция 0..255)
    - [x] /src/core/display.cpp добавлена структура для плавной генерации цвета static uint16_t blendColor(uint16_t c1, uint16_t c2, uint16_t t)
    - [x] /src/core/display.cpp переписана функция - Display::_volume()
    - [x] /config/myoptions_wrover.h и /config/myoptions_s3_alt.h добавлена переменная цвета превышенния ограничения VOL_OVER_COLOR    
@@ -161,17 +162,23 @@ Reengineering base release yoradio v0.9.693
 ---    
 > [!NOTE]
 текущая сборка
-
-- в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO (используйте короткие провода)       
+- в конфигурацию /config/myoptions_s3_alt.h включена поддержка SD карты в режиме SDIO ((короткие провода). SDC_CS = 49 — фиктивный (реального CS в SDIO нет, !=255 нужен для компиляции USE_SD).)       
    - [x] /src/core/sdmanager.h заменен целиком
    - [x] /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
-   - [x] /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI
-   - [x] /src/core/options.h
+   - [x] /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI (автостарт SDSPI закомментирован; SD поднимается лениво, по обращению)
+   - [x] /src/core/options.h — SD_HSPI отключён (#ifndef SD_HSPI закомментирован)
 - фикс при старте с sd не рисовался VU Meter (слишком быстрый старт)   
    - [x] /src/core/display.cpp строки 311, 327, 471
-- переписан функционал mute усилителя    
+- переписан функционал mute усилителя (плагин ampmute) (мьют внешнего усилителя (HT8698, вход CTRL) по состоянию плеера;
+снятие мьюта (ставим 1) после подключения к WiFi (Config::initNetwork). Инициализация в setup() ДО ветвления AP-режима — работает и в AP;
+loop() в главном цикле. Пин — AMP_MUTE_GPIO.)    
    - [x] добавлены файлы /src/core/ampmute.h и /src/core/ampmute.cpp
-- добавление дескриптора wifi сети
+   - [x] добавлены файлы /src/main.cpp — init до AP-ветвления, loop()   
+- гашение встроенного RGB-LED на GPIO48 (S3)(светодиод WS2812 на плате S3 защёлкивал наводки с «висящего» пина. Было: neopixelWrite(48,0,0,0). Стало: rgbLedWrite(48,0,0,0) + pinMode(48, OUTPUT) + digitalWrite(48, LOW) — нулевой кадр и удержание линии в LOW. Для Wrover-ветки — пусто (WS2812 на плате нет).)
+   - [x] /src/main.cpp
+- добавление дескриптора wifi сети ( (label) + расширение до 10 сетей, wifi.csv получил третью колонку — дескриптор сети. Переписан
+parseSsid (трёхколоночный, с параметром по умолчанию — старые вызовы работают), initNetwork читает и сохраняет label, добавлена labelBySsid() (без дескриптора — сам SSID). Дескриптор показывается на бут-экране (BOOTSTRING) и в _swichMode вместо «сырого» SSID. Список сетей расширен с 5 до 10 (neworkItem ssids[10]); в вебморду добавлено +5 полей (options.html.gz, script.js.gz: handleWiFiData, submitWiFi); кеш имён wifi/плейлиста в chunkedHtmlPage отключён — имена сохраняются
+в wifi.csv/playlist.csv во флеш-памяти.)
    - [x] /src/core/config.h в struct neworkItem добавлен дескриптор
    - [x] /src/core/config.h изменена сигнатура bool parseSsid
    - [x] /src/core/config.cpp замена реализации bool Config::parseSsid 
@@ -200,9 +207,10 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/display.cpp Page *pages[] расширяем на 5ть страниц 
    - [x] /src/core/display.cpp Page *pages[] меняем _buildPager()
    - [x] /src/core/display.cpp Page *pages[] меняем _swichMode()
+
 - переход на версию ядра 3 (espressif32@~8.0.0)
 
-## История изменений
+--прочее
 <!-- ======= даты «XX» и «(ранняя)» уточняются по git log --date=short;
      в каждую запись «Что» можно дописать «Коммит: a1b2c3d» ======= -->
 ### 2026-11-22 — Фикс бут-петли в SD-режиме + чистый откат PR_CHECKSD
@@ -370,75 +378,5 @@ RX-байтов. Доказательство жизнеспособности �
 раскладка). WEB-режим не затронут.
 **Изменённые файлы:** src/core/display.cpp (строки 311, 327, 471)
 
-### (ранняя) — Ограничение громкости: volToI2S() + MAX_VOL
-**Что:** ограничение громкости (чтобы динамики не «пожечь» по ВЧ)
-при сохранении диапазона энкодера 0..254: значение ручки размазывается
-на диапазон 0..MAX_VOL с учётом per-station offset (config.station.ovol).
-Звук физически не превышает MAX_VOL, ручка визуально доходит до конца.
-Альтернатива (жёсткое отсечение map(..., 0, 254)) задокументирована
-в комментарии к функции.
-**Изменённые файлы:**
-- config/myoptions_wrover.h, config/myoptions_s3_alt.h — MAX_VOL 190
-- src/core/player.cpp — переписана Player::volToI2S(uint8_t)
-**Отменено:** переменная VOL_WARN_ZONE 20 (зона плавного изменения
-цвета) — убрана из myoptions.
-**Проверено:** (заполнить: как проверяли — на слух/измерением?)
-
-### (ранняя) — Отображение превышения громкости цветом
-**Что:** индикация выхода за лимит MAX_VOL: полоса и цифры в диалоге —
-сырые данные 0..255 (ручка), число внизу — фактическое значение на ЦАПе
-(volToI2S). Цвет числа и цифр плавно подкрашивается VOL_OVER_COLOR:
-t = 0 до лимита, далее линейно до 255 при ручке 254.
-**Изменённые файлы:**
-- config/myoptions_wrover.h, config/myoptions_s3_alt.h — VOL_OVER_COLOR
-- src/displays/widgets/widgets.h — Widgets::setFgColor(uint16_t)
-- src/core/display.cpp — blendColor() (RGB565, пропорция 0..255),
-  переписана Display::_volume()
-
-### (ранняя) — Mute усилителя: плагин ampmute
-**Что:** мьют внешнего усилителя (HT8698, вход CTRL) по состоянию плеера;
-снятие мьюта (ставим 1) после подключения к WiFi (Config::initNetwork).
-Инициализация в setup() ДО ветвления AP-режима — работает и в AP;
-loop() в главном цикле. Пин — AMP_MUTE_GPIO.
-**Изменённые файлы:**
-- src/core/ampmute.h, src/core/ampmute.cpp — новый плагин
-- src/main.cpp — init до AP-ветвления, loop()
-
-### (ранняя) — Гашение встроенного RGB-LED на GPIO48 (S3)
-**Что:** светодиод WS2812 на плате S3 защёлкивал наводки с «висящего»
-пина. Было: neopixelWrite(48,0,0,0). Стало: rgbLedWrite(48,0,0,0) +
-pinMode(48, OUTPUT) + digitalWrite(48, LOW) — нулевой кадр и удержание
-линии в LOW. Для Wrover-ветки — пусто (WS2812 на плате нет).
-**Изменённые файлы:** src/main.cpp
-**Проверено:** (заполнить)
-
-### (ранняя) — Дескрипторы WiFi-сетей (label) + расширение до 10 сетей
-**Что:** wifi.csv получил третью колонку — дескриптор сети. Переписан
-parseSsid (трёхколоночный, с параметром по умолчанию — старые вызовы
-работают), initNetwork читает и сохраняет label, добавлена labelBySsid()
-(без дескриптора — сам SSID). Дескриптор показывается на бут-экране
-(BOOTSTRING) и в _swichMode вместо «сырого» SSID. Список сетей расширен
-с 5 до 10 (neworkItem ssids[10]); в вебморду добавлено +5 полей
-(options.html.gz, script.js.gz: handleWiFiData, submitWiFi);
-кеш имён wifi/плейлиста в chunkedHtmlPage отключён — имена сохраняются
-в wifi.csv/playlist.csv во флеш-памяти.
-**Изменённые файлы:**
-- src/core/config.h, src/core/config.cpp — labelBySsid, parseSsid,
-  initNetwork, BootString
-- src/core/netserver.h, netserver.cpp — handleIndex, chunkedHtmlPage
-- src/core/network.cpp — wifiBegin, WiFiLostConnection
-- src/core/display.cpp — _swichMode, case BOOTSTRING
-- data/www/options.html.gz, data/www/script.js.gz — +5 полей, JS
-
-### (ранняя) — SD в режиме SDIO (сборка s3 alt)
-**Что:** в /config/myoptions_s3_alt.h включена поддержка SD в режиме SDIO
-(короткие провода). SDC_CS = 49 — фиктивный (реального CS в SDIO нет,
-!=255 нужен для компиляции USE_SD).
-**Изменённые файлы:**
-- src/core/sdmanager.h — заменён целиком
-- src/core/sdmanager.cpp — инклюды, start()/stop()/cardPresent()
-- src/core/config.cpp — отключён блок #if defined(SD_SPIPINS) || SD_HSPI
-  (автостарт SDSPI закомментирован; SD поднимается лениво, по обращению)
-- src/core/options.h — SD_HSPI отключён (#ifndef SD_HSPI закомментирован)
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом
