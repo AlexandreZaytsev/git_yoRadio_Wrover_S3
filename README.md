@@ -167,7 +167,8 @@ Reengineering base release yoradio v0.9.693
    - [x] /src/core/sdmanager.cpp изменены инклюды и функции bool SDManager::start() void SDManager::stop() bool SDManager::cardPresent();
    - [x] /src/core/config.cpp отключен блок #if defined(SD_SPIPINS) || SD_HSPI (автостарт SDSPI закомментирован; SD поднимается лениво, по обращению)
    - [x] /src/core/options.h — SD_HSPI отключён (#ifndef SD_HSPI закомментирован)
-- фикс при старте с sd не рисовался VU Meter (слишком быстрый старт)   
+- Страховка пропущенного PSTART на старте с SD - фикс при старте с sd не рисовался VU Meter (слишком быстрый старт) (на холодном старте с SD плеер играет раньше, чем строится экран: событие PSTART теряется, VU оставался залочен. Фикс: в _start() VU лочится
+только если он выключен в настройках ИЛИ плеер ещё не играет; в loop() — однократная страховка (плеер играет, VU залочен -> принудительная раскладка). WEB-режим не затронут.)  
    - [x] /src/core/display.cpp строки 311, 327, 471
 - переписан функционал mute усилителя (плагин ampmute) (мьют внешнего усилителя (HT8698, вход CTRL) по состоянию плеера;
 снятие мьюта (ставим 1) после подключения к WiFi (Config::initNetwork). Инициализация в setup() ДО ветвления AP-режима — работает и в AP;
@@ -200,17 +201,18 @@ parseSsid (трёхколоночный, с параметром по умолч
 - показать инфо экран в браузере команда http://<ip-радио>/?dspinfo=1  
    - [x] /src/core/commandhandler.cpp в конце exec
    - [x] /src/core/display.h расширен private class Display на uint32_t _infoShown = 0;
-   - [x] /src/core/display.cpp дополнена функция void Display::loop() {
-- рисуем свою страницу инфо
+   - [x] /src/core/display.cpp дополнена функция void Display::loop() 
+- рисуем свою страницу инфо (вместо диалога при входе в INFO — отдельная страница: дескриптор сети крупно, ниже колонкой SSID, IP, RSSI (дБм), свободная память. Автовозврат в плеер через 10 секунд. Расширение pages[] до 5 страниц (_buildPager, _swichMode). Веб-экран dspinfo по команде ?dspinfo=1 — добавлен в commandhandler)
    - [x] /src/core/common.h добавляем enum pages_e
    - [x] /src/core/display.h расширен private class Display на FillWidget и TextWidget 
-   - [x] /src/core/display.cpp Page *pages[] расширяем на 5ть страниц 
-   - [x] /src/core/display.cpp Page *pages[] меняем _buildPager()
-   - [x] /src/core/display.cpp Page *pages[] меняем _swichMode()
+   - [x] /src/core/display.cpp Page *pages[] расширяем на 5ть страниц + страница INFO
+   - [x] /src/core/display.cpp Page *pages[] меняем _buildPager(), _swichMode(), loop()
+   - [x] /src/core/commandhandler.cpp — exec, браузер = ip вашей вебморды + параметр ?dspinfo=1
 
-- переход на версию ядра 3 (espressif32@~8.0.0)
+- переход на версию ядра 3 (espressif32@~8.0.0)(обновление фреймворка платформы в platformio.ini)
+   - [x] platformio.ini
 
---прочее
+--прочее, подготовка к переезду на новое железо
 <!-- ======= даты «XX» и «(ранняя)» уточняются по git log --date=short;
      в каждую запись «Что» можно дописать «Коммит: a1b2c3d» ======= -->
 ### 2026-11-22 — Фикс бут-петли в SD-режиме + чистый откат PR_CHECKSD
@@ -351,32 +353,5 @@ DIN(8) -> GND: ненулевые падают в 0 — вход читаетс�
 **Что:** отдельный скетч вне проекта: TX+RX на одном чипе, счётчик
 RX-байтов. Доказательство жизнеспособности дуплекса до трогания прошивки.
 **Проверено:** 882688 байт/5с, ненулевых 0 — дуплекс работает.
-
-<!-- ======= ранние правки: порядок/даты восстановить по коммитам ======= -->
-
-### (ранняя) — Переход на версию ядра 3 (espressif32@~8.0.0)
-**Что:** обновление фреймворка платформы в platformio.ini.
-**Изменённые файлы:** platformio.ini
-
-### (ранняя) — Своя страница INFO на дисплее
-**Что:** вместо диалога при входе в INFO — отдельная страница:
-дескриптор сети крупно, ниже колонкой SSID, IP, RSSI (дБм), свободная
-память. Автовозврат в плеер через 10 секунд. Расширение pages[] до 5
-страниц (_buildPager, _swichMode). Веб-экран dspinfo по команде
-?dspinfo=1 — добавлен в commandhandler.
-**Изменённые файлы:**
-- src/core/common.h — enum pages_e
-- src/core/display.h — приватные члены FillWidget/TextWidget, _infoShown
-- src/core/display.cpp — страница INFO, _buildPager(), _swichMode(), loop()
-- src/core/commandhandler.cpp — exec, ?dspinfo=1
-
-### (ранняя) — Страховка пропущенного PSTART на старте с SD
-**Что:** на холодном старте с SD плеер играет раньше, чем строится экран:
-событие PSTART теряется, VU оставался залочен. Фикс: в _start() VU лочится
-только если он выключен в настройках ИЛИ плеер ещё не играет; в loop() —
-однократная страховка (плеер играет, VU залочен -> принудительная
-раскладка). WEB-режим не затронут.
-**Изменённые файлы:** src/core/display.cpp (строки 311, 327, 471)
-
 
 этот проект уже не интересен... продолжаем [здесь](https://github.com/AlexandreZaytsev/git_yoRadio_Wrover_S3_Dual_Core) на двухпроцессорной матери с новым упсом
